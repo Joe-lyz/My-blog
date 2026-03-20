@@ -879,9 +879,17 @@
     .loading-msg { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 0.9rem; }
 
     /* ─── Homepage Two-Column Layout ─── */
+    :root {
+      --home-sidebar-width: 390px;
+    }
+    .home-layout-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
     .home-layout { display: flex; gap: 2rem; align-items: flex-start; }
     .photo-wall-sidebar {
-      width: 390px;
+      width: var(--home-sidebar-width);
       flex-shrink: 0;
       margin-left: 0;
       background: var(--card-bg);
@@ -897,7 +905,8 @@
       .home-layout { flex-direction: column; }
       .photo-wall-sidebar { width: 100%; margin-left: 0; }
       .home-top-grid { grid-template-columns: 1fr; }
-      .home-godot-block, .home-posts-block { margin-top: 0; max-width: 100%; }
+      .home-godot-block { margin-top: 0; max-width: 100%; }
+      .home-posts-block { width: 100%; max-width: 100%; margin-left: 0; }
       .home-planner-section { transform: none; margin-left: 0; }
       nav { gap: 1rem; flex-wrap: wrap; justify-content: flex-end; }
       .backup-grid { grid-template-columns: 1fr; }
@@ -934,16 +943,14 @@
       backdrop-filter: blur(4px);
     }
     .home-posts-block {
-      width: 100%;
-      max-width: 680px;
-      margin-top: 1rem;
+      width: min(680px, calc(100% - var(--home-sidebar-width) - 2rem));
+      margin-left: calc(var(--home-sidebar-width) + 2rem);
       background: var(--card-bg);
       border: 1px solid var(--line);
       border-radius: 16px;
       box-shadow: var(--card-shadow);
       padding: 1rem 1rem 0.4rem;
       backdrop-filter: blur(4px);
-      align-self: flex-start;
     }
 
     @media (max-width: 640px) {
@@ -1787,7 +1794,8 @@
 
   <!-- 文章列表 -->
   <div id="list-view" class="view active">
-    <div class="home-layout">
+    <div class="home-layout-shell">
+      <div class="home-layout">
       <div class="photo-wall-sidebar">
         <div class="pw-header">
           <div class="pw-title">照片墙</div>
@@ -1863,13 +1871,14 @@
           </div>
         </div>
 
-        <div class="home-posts-block">
-          <p class="section-label">最新文章</p>
-          <ul class="post-list" id="post-list">
-            <div class="loading-msg">加载中...</div>
-          </ul>
-          <div class="post-pagination" id="post-pagination"></div>
-        </div>
+      </div>
+
+      <div class="home-posts-block">
+        <p class="section-label">最新文章</p>
+        <ul class="post-list" id="post-list">
+          <li class="loading-msg">加载中...</li>
+        </ul>
+        <div class="post-pagination" id="post-pagination"></div>
       </div>
     </div>
   </div>
