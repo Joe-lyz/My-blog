@@ -934,16 +934,16 @@
       backdrop-filter: blur(4px);
     }
     .home-posts-block {
-      grid-column: 1;
-      grid-row: 3;
-      margin-top: -6px;
+      width: 100%;
       max-width: 680px;
+      margin-top: 1rem;
       background: var(--card-bg);
       border: 1px solid var(--line);
       border-radius: 16px;
       box-shadow: var(--card-shadow);
       padding: 1rem 1rem 0.4rem;
       backdrop-filter: blur(4px);
+      align-self: flex-start;
     }
 
     @media (max-width: 640px) {
@@ -1861,17 +1861,17 @@
               </div>
             </div>
           </div>
+        </div>
 
         <div class="home-posts-block">
-        <p class="section-label">最新文章</p>
-        <ul class="post-list" id="post-list">
-          <div class="loading-msg">加载中...</div>
-        </ul>
-        <div class="post-pagination" id="post-pagination"></div>
+          <p class="section-label">最新文章</p>
+          <ul class="post-list" id="post-list">
+            <div class="loading-msg">加载中...</div>
+          </ul>
+          <div class="post-pagination" id="post-pagination"></div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- 阅读文章 -->
