@@ -7,26 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink: #2f241b;
-      --paper: #fffaf5;
-      --paper-soft: #fff3e6;
-      --accent: #e97a74;
-      --accent-strong: #d8615d;
-      --muted: #8f7f72;
-      --line: #f1dfcf;
-      --hover-bg: #fff1e4;
-      --card-bg: rgba(255, 255, 255, 0.78);
-      --card-shadow: 0 14px 34px rgba(193, 124, 102, 0.15);
+      --ink: #1a1008;
+      --paper: #faf7f2;
+      --accent: #c0392b;
+      --muted: #8c7b6b;
+      --line: #e8e0d5;
+      --hover-bg: #f2ede5;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Noto Sans SC', sans-serif;
-      background:
-        radial-gradient(circle at 16% 18%, rgba(255, 214, 198, 0.35), transparent 38%),
-        radial-gradient(circle at 80% 6%, rgba(255, 236, 210, 0.45), transparent 36%),
-        linear-gradient(180deg, #fffaf5 0%, #fff4ea 50%, #fffbf7 100%);
+      background: var(--paper);
       color: var(--ink);
       min-height: 100vh;
     }
@@ -137,12 +130,10 @@
 
     /* ─── Header ─── */
     header {
-      border-bottom: 1px solid rgba(233, 193, 165, 0.6);
-      padding: 1.25rem 0 0;
+      border-bottom: 2px solid var(--ink);
+      padding: 2rem 0 0;
       position: sticky; top: 0;
-      background: rgba(255, 250, 245, 0.9);
-      backdrop-filter: blur(10px);
-      z-index: 100;
+      background: var(--paper); z-index: 100;
     }
     .header-inner {
       max-width: 1320px; margin: 0 auto; padding: 0 2rem;
@@ -152,7 +143,6 @@
       font-family: 'Noto Serif SC', serif;
       font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px;
       transform: translateX(-220px);
-      text-shadow: 0 3px 12px rgba(180, 118, 97, 0.2);
     }
     .site-title span { color: var(--accent); }
 
@@ -177,13 +167,8 @@
 
     /* ─── Hero Section ─── */
     .hero-section {
-      text-align: center;
-      padding: 1.6rem 1.2rem 2rem;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      margin-bottom: 1.2rem;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 243, 230, 0.92));
-      box-shadow: var(--card-shadow);
+      text-align: center; padding: 1.6rem 0 2rem;
+      border-bottom: 1px solid var(--line); margin-bottom: 1.2rem;
     }
     .hero-icon {
       font-size: 2.5rem; margin-bottom: 1.2rem;
@@ -198,54 +183,11 @@
       font-size: 1rem; color: var(--muted);
       font-style: italic; margin: -0.4rem 0 1rem; letter-spacing: 0.02em;
     }
-    .hero-divider { width: 52px; height: 3px; background: linear-gradient(90deg, var(--accent), #f2b98d); margin: 0 auto 1.5rem; border-radius: 999px; }
+    .hero-divider { width: 40px; height: 2px; background: var(--accent); margin: 0 auto 1.5rem; }
     .hero-desc {
       font-size: 0.88rem; color: var(--muted); line-height: 1.8;
       max-width: 420px; margin: 0 auto;
     }
-
-
-    .home-godot-block {
-      grid-column: 1;
-      grid-row: 2;
-      margin-top: 0.2rem;
-      max-width: 640px;
-    }
-    #slingshot-godot-host {
-      width: 100%;
-      min-height: 280px;
-      border: 1px solid #f0d9c8;
-      border-radius: 16px;
-      background: linear-gradient(180deg, #fffdfa 0%, #fff4e8 100%);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.8rem;
-    }
-    #slingshot-godot-host canvas {
-      width: 100% !important;
-      max-width: 100%;
-      height: auto !important;
-      border-radius: 12px;
-      background: #1f1711;
-      aspect-ratio: 16 / 9;
-      box-shadow: inset 0 0 0 1px rgba(255, 222, 195, 0.2);
-    }
-    .godot-fallback-msg {
-      color: var(--muted);
-      font-size: 0.84rem;
-      text-align: center;
-      line-height: 1.8;
-      padding: 0.6rem 0.2rem;
-    }
-    .slingshot-hint {
-      margin-top: 0.55rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      letter-spacing: 0.01em;
-    }
-
 
     /* ─── Post List ─── */
     .section-label {
@@ -657,6 +599,30 @@
       pointer-events: none;
     }
 
+    .fireworks-btn {
+      position: fixed;
+      right: 24px;
+      top: 108px;
+      bottom: auto;
+      z-index: 3600;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .fireworks-btn:hover { border-color: var(--accent); color: var(--accent); }
+    #fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 3500;
+      pointer-events: none;
+      display: none;
+    }
+
 
     .trash-fab {
       position: fixed;
@@ -879,25 +845,15 @@
     .loading-msg { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 0.9rem; }
 
     /* ─── Homepage Two-Column Layout ─── */
-    .home-layout { display: flex; gap: 2rem; align-items: flex-start; }
-    .photo-wall-sidebar {
-      width: 390px;
-      flex-shrink: 0;
-      margin-left: 0;
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--card-shadow);
-      padding: 0.9rem;
-      backdrop-filter: blur(4px);
-    }
+    .home-layout { display: flex; gap: 2.5rem; }
+    .photo-wall-sidebar { width: 420px; flex-shrink: 0; margin-left: 8px; }
     .home-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     #list-view { max-width: 1320px; }
     @media (max-width: 960px) {
       .home-layout { flex-direction: column; }
       .photo-wall-sidebar { width: 100%; margin-left: 0; }
       .home-top-grid { grid-template-columns: 1fr; }
-      .home-godot-block, .home-posts-block { margin-top: 0; max-width: 100%; }
+      .home-posts-block { margin-top: 0; max-width: 100%; }
       .home-planner-section { transform: none; margin-left: 0; }
       nav { gap: 1rem; flex-wrap: wrap; justify-content: flex-end; }
       .backup-grid { grid-template-columns: 1fr; }
@@ -916,7 +872,7 @@
     .home-top-grid {
       display: grid;
       grid-template-columns: minmax(420px, 1fr) minmax(360px, 430px);
-      gap: 1.4rem;
+      gap: 1.2rem;
       align-items: start;
       margin-bottom: 0.2rem;
     }
@@ -925,32 +881,18 @@
       grid-row: 1 / span 2;
       margin-top: 0;
       margin-left: auto;
-      transform: translateX(16px);
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 16px;
+      transform: translateX(34px);
+      background: #fff;
+      border: 2px solid #e9d7c2;
+      border-radius: 10px;
       padding: 1rem;
-      box-shadow: var(--card-shadow);
-      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.05);
     }
     .home-posts-block {
       grid-column: 1;
-      grid-row: 3;
-      margin-top: -6px;
-      max-width: 680px;
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: var(--card-shadow);
-      padding: 1rem 1rem 0.4rem;
-      backdrop-filter: blur(4px);
-    }
-
-    @media (max-width: 640px) {
-      #slingshot-godot-host {
-        min-height: 200px;
-        padding: 0.6rem;
-      }
+      grid-row: 2;
+      margin-top: -8px;
+      max-width: 640px;
     }
     .post-pagination {
       display: flex;
@@ -1097,6 +1039,36 @@
     .photo-modal-actions .pm-save {
       background: var(--ink); color: var(--paper); border-color: var(--ink);
     }
+
+    .doodle-wrap { max-width: 1100px; margin: 0 auto; }
+    .doodle-toolbar { display:flex; flex-wrap:wrap; gap:0.7rem; align-items:center; margin-bottom: 1rem; }
+    .doodle-toolbar label { font-size: 0.82rem; color: var(--muted); display:flex; align-items:center; gap:0.4rem; }
+    .doodle-toolbar input[type="range"] { width: 140px; accent-color: var(--accent); }
+    .doodle-toolbar button { border:1px solid var(--line); background:#fff; border-radius: 6px; padding: 0.45rem 0.75rem; cursor:pointer; }
+    .doodle-toolbar button:hover { border-color: var(--ink); }
+    .doodle-board-wrap { border:1px solid var(--line); border-radius: 8px; overflow:auto; background:#fff; padding:0.6rem; }
+    #doodle-canvas { background:#fff; display:block; margin:0 auto; cursor:crosshair; max-width:100%; touch-action: none; }
+
+    /* ─── Godot Slingshot Input Boundary ─── */
+    .doodle-gallery { margin-top: 1rem; display:grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 0.8rem; }
+    .doodle-card { border:1px solid var(--line); border-radius: 8px; padding:0.5rem; background:#fff; }
+    .doodle-card img { width:100%; height:120px; object-fit:cover; border-radius:6px; display:block; }
+    .doodle-card-title { font-size:0.75rem; color:var(--muted); margin-top:0.4rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .doodle-palette { display:flex; gap:0.45rem; align-items:center; }
+    .doodle-color-chip { width:22px; height:22px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); cursor:pointer; }
+    .doodle-color-chip.active { box-shadow:0 0 0 2px var(--ink); }
+    .doodle-brush-group { display:flex; gap:0.45rem; align-items:center; }
+    .doodle-brush-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .doodle-card-actions { display:flex; gap:0.4rem; margin-top:0.35rem; }
+    .doodle-card-actions button { flex:1; border:1px solid var(--line); background:#fff; border-radius:6px; padding:0.3rem 0.4rem; font-size:0.72rem; cursor:pointer; }
+
+    .bookshelf-search { margin-bottom: 1rem; border:1px solid var(--line); border-radius:8px; padding:0.8rem; background:#fff; }
+    .bookshelf-search-row { display:flex; gap:0.6rem; }
+    .bookshelf-search-row input { flex:1; border:1px solid var(--line); border-radius:6px; padding:0.5rem 0.7rem; }
+    .bookshelf-search-row button { border:1px solid var(--line); background:#fff; border-radius:6px; padding:0.45rem 0.75rem; cursor:pointer; }
+    .bookshelf-search-results { margin-top:0.7rem; display:grid; gap:0.5rem; }
+    .book-search-item { border:1px dashed var(--line); border-radius:6px; padding:0.5rem; display:flex; justify-content:space-between; gap:0.6rem; }
+    .book-search-item button { border:1px solid var(--line); background:#fff; border-radius:6px; padding:0.35rem 0.6rem; cursor:pointer; white-space:nowrap; }
     .crop-overlay {
       position: absolute; border: 2px dashed var(--accent);
       background: rgba(192,57,43,0.1); pointer-events: none; display: none;
@@ -1430,7 +1402,8 @@
       padding-top: 0.35rem;
     }
     .site-title {
-      padding: 0.9rem 0 1.05rem 1.4rem;
+      transform: translateX(0);
+      padding: 0.9rem 0 1.05rem 1.9rem;
       text-shadow: 0 1px 0 rgba(255,255,255,0.8);
     }
     nav button {
@@ -1453,6 +1426,9 @@
     .photo-wall-sidebar,
     .backup-card,
     .profile-edit-form,
+    .doodle-board-wrap,
+    .doodle-card,
+    .doodle-toolbar,
     .writing-history,
     .planner-detail,
     .audio-url-panel,
@@ -1460,8 +1436,7 @@
     .photo-modal,
     .ebook-settings-panel,
     .bookshelf,
-    #epub-viewer,
-    #slingshot-godot-host {
+    #epub-viewer {
       background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,248,242,0.9));
       border: 1px solid rgba(255,255,255,0.58);
       box-shadow: var(--shadow-soft);
@@ -1493,15 +1468,31 @@
       align-items: flex-start;
       gap: 2rem;
     }
+    .home-main-content {
+      gap: 1.15rem;
+    }
     .photo-wall-sidebar {
       padding: 1.2rem;
       margin-left: 0;
       border-radius: 28px;
     }
+    .home-top-grid {
+      grid-template-columns: minmax(420px, 1.1fr) minmax(360px, 0.9fr);
+      gap: 1.4rem;
+      margin-bottom: 0;
+    }
     .home-planner-section {
       border-radius: 26px;
       border-width: 1px;
-      transform: translateX(18px);
+      transform: translateX(150px);
+    }
+    .home-posts-block {
+      grid-column: 1;
+      grid-row: 2;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 0;
+      transform: translateY(-100px);
     }
     .pw-container {
       border-radius: 22px;
@@ -1518,6 +1509,8 @@
     .editor-toolbar,
     .editor-area,
     .profile-edit-form,
+    .doodle-board-wrap,
+    .doodle-card,
     .post-item,
     .book-cover,
     .ebook-toc-panel {
@@ -1681,6 +1674,26 @@
     .polaroid {
       border-radius: 14px;
     }
+    .doodle-toolbar {
+      padding: 0.9rem 1rem;
+      border-radius: 18px;
+    }
+    .doodle-toolbar button,
+    .doodle-card-actions button {
+      border-radius: 999px;
+      background: rgba(255,255,255,0.82);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .doodle-toolbar button:hover,
+    .doodle-card-actions button:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.96);
+    }
+    .doodle-board-wrap,
+    .doodle-card {
+      border-radius: 22px;
+    }
     .polaroid {
       box-shadow: 0 8px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
     }
@@ -1707,7 +1720,17 @@
       .photo-wall-sidebar {
         width: 100%;
       }
+      .home-top-grid {
+        grid-template-columns: 1fr;
+      }
       .home-planner-section {
+        transform: none;
+      }
+      .home-posts-block {
+        grid-column: 1;
+        grid-row: auto;
+        width: 100%;
+        max-width: 100%;
         transform: none;
       }
       .header-inner {
@@ -1717,6 +1740,10 @@
     @media (max-width: 640px) {
       main {
         padding: 2rem 1rem 6rem;
+      }
+      .fireworks-btn {
+        right: 16px;
+        top: 154px;
       }
       .hero-section,
       .photo-wall-sidebar,
@@ -1777,6 +1804,7 @@
       <button class="active" data-view="list" onclick="showView('list', this)">全部文章</button>
       <button data-view="write" onclick="showView('write', this)">写新文章</button>
       <button data-view="backup" onclick="showView('backup', this)">备份日记</button>
+      <button data-view="doodle" onclick="showView('doodle', this)">涂鸦板</button>
       <button data-view="reader" onclick="showView('reader', this)">阅读</button>
       <button data-view="about" onclick="showView('about', this)">关于我</button>
     </nav>
@@ -1828,14 +1856,6 @@
               用文字记录生活的呼吸，用心感受每一个平凡的瞬间。<br>
               欢迎来到我的小角落，这里收藏着关于生活、思考与梦想的文字。
             </div>
-          </div>
-
-          <div class="home-godot-block">
-            <p class="section-label">弹弓小游戏</p>
-            <div id="slingshot-godot-host" aria-live="polite">
-              <div class="godot-fallback-msg">弹弓加载中...</div>
-            </div>
-            <p class="slingshot-hint">拖动橡皮筋中点并松手，弹丸会按偏移量发射；Y 字躯干保持固定。</p>
           </div>
 
           <div class="home-planner-section">
@@ -1988,12 +2008,45 @@
     </div>
   </div>
 
+  <!-- 涂鸦板 -->
+  <div id="doodle-view" class="view">
+    <div class="doodle-wrap">
+      <p class="section-label">涂鸦板</p>
+      <div class="doodle-toolbar">
+        <div class="doodle-palette" id="doodle-palette"></div>
+        <label>画笔颜色 <input type="color" id="doodle-color" value="#c0392b" onchange="setDoodleColor(this.value)"></label>
+        <div class="doodle-brush-group">
+          <button class="doodle-brush-btn active" data-brush="pen" onclick="setDoodleBrush('pen', this)">钢笔</button>
+          <button class="doodle-brush-btn" data-brush="marker" onclick="setDoodleBrush('marker', this)">马克笔</button>
+          <button class="doodle-brush-btn" data-brush="pencil" onclick="setDoodleBrush('pencil', this)">铅笔</button>
+        </div>
+        <label>画笔粗细 <input type="range" id="doodle-size" min="1" max="40" value="6" oninput="setDoodleSize(this.value)"><span id="doodle-size-label">6px</span></label>
+        <button onclick="toggleDoodleEraser()" id="doodle-eraser-btn">橡皮擦</button>
+        <button onclick="clearDoodleCanvas()">清空画布</button>
+        <button onclick="document.getElementById('doodle-upload-input').click()">上传图片底图</button>
+        <button onclick="saveDoodleImage()">保存涂鸦</button>
+      </div>
+      <div class="doodle-board-wrap">
+        <canvas id="doodle-canvas" width="980" height="580"></canvas>
+      </div>
+      <input type="file" id="doodle-upload-input" accept="image/*" style="display:none;">
+      <div class="doodle-gallery" id="doodle-gallery"></div>
+    </div>
+  </div>
+
   <!-- 电子书阅读 -->
   <div id="reader-view" class="view">
     <div class="bookshelf" id="bookshelf-section">
       <div class="bookshelf-header">
         <div class="bookshelf-title">我的书架</div>
         <button class="bookshelf-import-btn" onclick="document.getElementById('epub-input').click()">导入电子书</button>
+      </div>
+      <div class="bookshelf-search">
+        <div class="bookshelf-search-row">
+          <input type="text" id="book-search-input" placeholder="搜索公开 EPUB（例如书名/作者）...">
+          <button onclick="searchBooksOnline()">在线搜索</button>
+        </div>
+        <div class="bookshelf-search-results" id="bookshelf-search-results"></div>
       </div>
       <div class="bookshelf-grid" id="bookshelf-grid">
         <div class="empty-state">&#128218;<p>书架空空如也，导入一本电子书开始阅读吧！</p></div>
@@ -2228,6 +2281,8 @@
   <iframe id="audio-external-frame" title="external-audio" allow="autoplay; fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
 <button class="player-sidebar-toggle" id="player-sidebar-toggle" onclick="showAudioPlayer()">&#9835;</button>
+<button class="fireworks-btn" id="fireworks-btn" onclick="launchTripleFireworks()">🎆 放烟花</button>
+<canvas id="fireworks-canvas"></canvas>
 
 <!-- Audio URL Panel -->
 <div class="audio-url-panel" id="audio-url-panel">
@@ -2261,6 +2316,7 @@
   var calendarData = {};
   var todosData = {};
   var photosData = [];
+  var doodlesData = [];
   var booksData = [];
   var postPage = 1;
   var postPageSize = 5;
@@ -2290,6 +2346,19 @@
   var cropMode = false;
   var cropStart = null;
   var cropRect = null;
+
+  // Doodle state
+  var doodleCtx = null;
+  var doodleDrawing = false;
+  var doodleBrushColor = '#c0392b';
+  var doodleBrushSize = 6;
+  var doodleEraser = false;
+  var doodleBrushType = 'pen';
+  var doodleLastX = 0;
+  var doodleLastY = 0;
+  var doodleLastTime = 0;
+  var doodlePaletteColors = ['#1a1008','#c0392b','#2563eb','#16a34a','#f59e0b','#7c3aed','#ec4899','#ffffff'];
+  var fireworksRunning = false;
 
   // E-book state
   var currentBook = null;
@@ -2390,6 +2459,29 @@
       startTop: 0
     };
 
+    var clickTimer = null;
+    var clickCount = 0;
+    var holdTimer = null;
+    var holdActive = false;
+
+    function jumpBear(distance) {
+      var rect = bear.getBoundingClientRect();
+      var angle = Math.random() * Math.PI * 2;
+      var nx = rect.left + Math.cos(angle) * distance;
+      var ny = rect.top + Math.sin(angle) * distance;
+      var maxLeft = window.innerWidth - bear.offsetWidth;
+      var maxTop = window.innerHeight - bear.offsetHeight;
+      nx = Math.max(0, Math.min(maxLeft, nx));
+      ny = Math.max(0, Math.min(maxTop, ny));
+      bear.style.transition = 'left 0.28s ease, top 0.28s ease, transform 0.18s ease';
+      bear.style.left = nx + 'px';
+      bear.style.top = ny + 'px';
+      bear.style.right = 'auto';
+      bear.style.transform = 'scale(0.96)';
+      setTimeout(function(){ bear.style.transform = 'scale(1)'; }, 120);
+      setTimeout(function(){ bear.style.transition = ''; }, 320);
+    }
+
     bear.addEventListener('pointerdown', function (e) {
       drag.active = true;
       drag.pointerId = e.pointerId;
@@ -2406,6 +2498,12 @@
 
       bear.classList.add('dragging');
       bear.setPointerCapture(e.pointerId);
+
+      holdActive = false;
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function(){
+        holdActive = true;
+      }, 450);
       e.preventDefault();
     });
 
@@ -2432,6 +2530,19 @@
       drag.active = false;
       bear.classList.remove('dragging');
       bear.releasePointerCapture(e.pointerId);
+
+      clearTimeout(holdTimer);
+      var movedFar = Math.abs(e.clientX - drag.startX) > 6 || Math.abs(e.clientY - drag.startY) > 6;
+      if (holdActive) return;
+      if (movedFar) return;
+
+      clickCount += 1;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(function() {
+        if (clickCount >= 2) jumpBear(260);
+        else jumpBear(130);
+        clickCount = 0;
+      }, 210);
     }
 
     bear.addEventListener('pointerup', stopDrag);
@@ -2480,16 +2591,18 @@
         apiFetch('/api/calendar'),
         apiFetch('/api/todos'),
         apiFetch('/api/photos'),
+        apiFetch('/api/doodles'),
         apiFetch('/api/books'),
         apiFetch('/api/trash')
       ]);
-      posts = (results[0] || []).map(function(post) { return normalizeLegacyPostTime(post); });
+      posts = ensurePostsArray(results[0]);
       profile = results[1] || profile;
       calendarData = results[2] || {};
       todosData = results[3] || {};
       photosData = results[4] || [];
-      booksData = results[5] || [];
-      deletedPosts = (results[6] || []).map(function(post) { return normalizeLegacyPostTime(post); });
+      doodlesData = results[5] || [];
+      booksData = results[6] || [];
+      deletedPosts = (results[7] || []).map(function(post) { return normalizeLegacyPostTime(post); });
       purgeExpiredTrash();
       renderList();
       renderTrashBin();
@@ -2501,6 +2614,7 @@
       renderCalendar();
       renderWritingHistory();
       renderBackupPostList();
+      renderDoodleGallery();
     } catch (e) {
       console.error('Failed to load data:', e);
       renderList();
@@ -2513,14 +2627,45 @@
       renderCalendar();
       renderWritingHistory();
       renderBackupPostList();
+      renderDoodleGallery();
     }
     dataReady = true;
     checkReady();
     initAudioPlayer();
   }
 
+  function normalizePost(raw) {
+    var post = raw && typeof raw === 'object' ? Object.assign({}, raw) : {};
+    var now = new Date();
+    if (!post.id) post.id = Date.now() + Math.floor(Math.random() * 1000);
+    post.type = post.type === 'blog' ? 'blog' : 'diary';
+    if (typeof post.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(post.date)) {
+      var parsedDate = post.date ? new Date(post.date) : now;
+      post.date = isNaN(parsedDate.getTime()) ? formatDateGMT8(now) : formatDateGMT8(parsedDate);
+    }
+    post.time = typeof post.time === 'string' ? post.time : '';
+    post.title = (post.title || '未命名文章').toString();
+    post.body = (typeof post.body === 'string' && post.body) ? post.body : (typeof post.content === 'string' ? post.content : '<p></p>');
+    if (!post.excerpt) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = post.body;
+      var text = (tmp.textContent || tmp.innerText || '').trim();
+      post.excerpt = (text ? text.slice(0, 60) : '无摘要') + '...';
+    } else {
+      post.excerpt = post.excerpt.toString();
+    }
+    post = normalizeLegacyPostTime(post);
+    return post;
+  }
+
+  function ensurePostsArray(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw.map(function(item) { return normalizePost(item); });
+  }
+
   // ─── Render Post List ───
   function renderList() {
+    posts = ensurePostsArray(posts);
     var ul = document.getElementById('post-list');
     var pager = document.getElementById('post-pagination');
     if (posts.length === 0) {
@@ -2538,16 +2683,17 @@
     var pageItems = sorted.slice(startIdx, startIdx + postPageSize);
 
     ul.innerHTML = pageItems.map(function(p) {
-      var timeStr = p.time ? ' ' + p.time : '';
-      return '<li class="post-item" onclick="openPost(' + p.id + ')">' +
+      var safePost = normalizePost(p);
+      var timeStr = safePost.time ? ' ' + safePost.time : '';
+      return '<li class="post-item" onclick="openPost(' + safePost.id + ')">' +
         '<div class="post-date">' +
-          p.date.replace(/-/g, '/') + timeStr +
+          safePost.date.replace(/-/g, '/') + timeStr +
           '<br>' +
-          '<span class="post-tag tag-' + p.type + '">' + (p.type === 'blog' ? '博客' : '日记') + '</span>' +
+          '<span class="post-tag tag-' + safePost.type + '">' + (safePost.type === 'blog' ? '博客' : '日记') + '</span>' +
         '</div>' +
         '<div>' +
-          '<div class="post-title">' + escapeHtml(p.title) + '</div>' +
-          '<div class="post-excerpt">' + escapeHtml(p.excerpt) + '</div>' +
+          '<div class="post-title">' + escapeHtml(safePost.title) + '</div>' +
+          '<div class="post-excerpt">' + escapeHtml(safePost.excerpt) + '</div>' +
         '</div>' +
       '</li>';
     }).join('');
@@ -2609,7 +2755,7 @@
   async function restorePost(id) {
     var post = deletedPosts.find(function(p){ return p.id === id; });
     if (!post) return;
-    var restoreData = Object.assign({}, post);
+    var restoreData = normalizePost(Object.assign({}, post));
     delete restoreData.deletedAt;
     try {
       await apiFetch('/api/posts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(restoreData) });
@@ -2657,6 +2803,7 @@
   function openPost(id) {
     var post = posts.find(function(p) { return p.id === id; });
     if (!post) return;
+    post = normalizePost(post);
     currentPostId = id;
     var timeStr = post.time ? ' ' + post.time : '';
     document.getElementById('detail-meta').textContent =
@@ -2838,12 +2985,55 @@
     if (name === 'list') { renderList(); renderPhotoWall(); renderPlannerCalendar(); renderPlannerDetail(); renderCalendar(); renderWritingHistory(); }
     if (name === 'about') { renderProfile(); }
     if (name === 'backup') { renderBackupPostList(); }
+    if (name === 'doodle') { initDoodleBoard(); renderDoodleGallery(); }
     if (name === 'reader') { renderBookshelf(); }
     if (name === 'write' && !editingPostId) {
       document.getElementById('write-label').textContent = '写一篇新文章';
       document.getElementById('submit-btn').innerHTML = '发布文章 &#8594;';
       document.getElementById('cancel-edit-btn').style.display = 'none';
       resetWriteTimer();
+    }
+  }
+
+  function showSlingshotFallback(message) {
+    return;
+    var container = resolveSlingshotContainer();
+    if (!container) return;
+    container.innerHTML = '<div class="godot-fallback-msg">' + escapeHtml(message || '弹弓加载失败，请刷新') + '</div>';
+  }
+
+  function initSlingshotGodot() {
+    return;
+
+    window.__slingshotBooted = true;
+    container.dataset.godotBooted = '1';
+    bindSlingshotTouchPolicy();
+
+    if (typeof window.startSlingshotGodot !== 'function') {
+      window.__slingshotBooted = false;
+      showSlingshotFallback('弹弓加载失败，请刷新');
+      return;
+    }
+
+    try {
+      var maybeInstance = window.startSlingshotGodot(container);
+      if (maybeInstance && typeof maybeInstance.then === 'function') {
+        maybeInstance.then(function(instance) {
+          window.__slingshotGodotInstance = instance || null;
+          setGodotVisibilityState(currentView === 'list');
+        }).catch(function(err) {
+          console.error('Failed to boot slingshot Godot:', err);
+          window.__slingshotBooted = false;
+          showSlingshotFallback('弹弓加载失败，请刷新');
+        });
+      } else {
+        window.__slingshotGodotInstance = maybeInstance || null;
+        setGodotVisibilityState(currentView === 'list');
+      }
+    } catch (err) {
+      console.error('Failed to boot slingshot Godot:', err);
+      window.__slingshotBooted = false;
+      showSlingshotFallback('弹弓加载失败，请刷新');
     }
   }
 
@@ -3639,7 +3829,7 @@
   }
 
   function getDayPostsHtml(dateStr) {
-    var datePosts = posts.filter(function(p) { return p.date === dateStr; });
+    var datePosts = ensurePostsArray(posts).filter(function(p) { return p.date === dateStr; });
     if (datePosts.length === 0) {
       return '<div class="planner-diary-empty">这一天还没有发表文章。</div>';
     }
@@ -4832,48 +5022,498 @@
     el.addEventListener('pointerdown', onPointerDown);
   }
 
+  function initDoodleBoard() {
+    var canvas = document.getElementById('doodle-canvas');
+    if (!canvas || canvas.__doodleInited) return;
+    doodleCtx = canvas.getContext('2d');
+    doodleCtx.lineCap = 'round';
+    doodleCtx.lineJoin = 'round';
+    doodleCtx.fillStyle = '#ffffff';
+    doodleCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.__doodleInited = true;
+    initDoodlePalette();
 
-  function showGodotFallback(message) {
-    var host = document.getElementById('slingshot-godot-host');
-    if (!host) return;
-    host.innerHTML = '<div class="godot-fallback-msg">' + escapeHtml(message || '弹弓加载失败，请刷新') + '</div>';
+    function getPoint(e) {
+      var rect = canvas.getBoundingClientRect();
+      var clientX = e.clientX;
+      var clientY = e.clientY;
+      if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      var p = getPoint(e);
+      doodleDrawing = true;
+      doodleLastX = p.x;
+      doodleLastY = p.y;
+      doodleLastTime = Date.now();
+    }
+
+    function moveDraw(e) {
+      if (!doodleDrawing || !doodleCtx) return;
+      e.preventDefault();
+      var p = getPoint(e);
+      var now = Date.now();
+      var dt = Math.max(1, now - doodleLastTime);
+      var dist = Math.hypot(p.x - doodleLastX, p.y - doodleLastY);
+      var speed = dist / dt;
+
+      doodleCtx.globalCompositeOperation = doodleEraser ? 'destination-out' : 'source-over';
+      doodleCtx.strokeStyle = doodleBrushColor;
+      doodleCtx.lineWidth = getDoodleStrokeWidth(speed);
+      doodleCtx.globalAlpha = getDoodleBrushAlpha();
+      doodleCtx.beginPath();
+      doodleCtx.moveTo(doodleLastX, doodleLastY);
+      doodleCtx.lineTo(p.x, p.y);
+      doodleCtx.stroke();
+
+      if (!doodleEraser && doodleBrushType === 'pencil') {
+        doodleCtx.globalAlpha = 0.08;
+        doodleCtx.fillStyle = doodleBrushColor;
+        doodleCtx.beginPath();
+        doodleCtx.arc(p.x + (Math.random() - 0.5) * 2, p.y + (Math.random() - 0.5) * 2, Math.max(0.5, doodleBrushSize * 0.12), 0, Math.PI * 2);
+        doodleCtx.fill();
+      }
+
+      doodleLastX = p.x;
+      doodleLastY = p.y;
+      doodleLastTime = now;
+    }
+
+    function stopDraw() {
+      doodleDrawing = false;
+      doodleCtx.globalAlpha = 1;
+    }
+
+    canvas.addEventListener('pointerdown', startDraw);
+    canvas.addEventListener('pointermove', moveDraw);
+    canvas.addEventListener('pointerup', stopDraw);
+    canvas.addEventListener('pointerleave', stopDraw);
   }
 
-  function initSlingshotGodot() {
-    var host = document.getElementById('slingshot-godot-host');
-    if (!host) return;
+  function initDoodlePalette() {
+    var wrap = document.getElementById('doodle-palette');
+    if (!wrap) return;
+    wrap.innerHTML = doodlePaletteColors.map(function(c, idx){
+      var border = c.toLowerCase() === '#ffffff' ? ' style="box-shadow:0 0 0 1px #bbb;"' : '';
+      return '<button class="doodle-color-chip ' + (idx === 1 ? 'active' : '') + '" data-color="' + c + '" onclick="selectDoodleChip(\'' + c + '\', this)"' + border + '></button>';
+    }).join('');
+    var chips = wrap.querySelectorAll('.doodle-color-chip');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].style.background = chips[i].getAttribute('data-color');
+    }
+  }
 
-    var canvas = document.createElement('canvas');
-    canvas.id = 'slingshot-godot-canvas';
-    canvas.width = 960;
-    canvas.height = 540;
-    host.innerHTML = '';
-    host.appendChild(canvas);
+  function selectDoodleChip(color, btn) {
+    setDoodleColor(color);
+    document.querySelectorAll('.doodle-color-chip').forEach(function(ch){ ch.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    var input = document.getElementById('doodle-color');
+    if (input) input.value = color;
+  }
 
-    var script = document.createElement('script');
-    script.src = '/godot/slingshot/slingshot.js';
-    script.async = true;
-    script.onload = function() {
-      if (typeof Engine !== 'function') {
-        showGodotFallback('弹弓加载失败，请刷新');
+  function setDoodleBrush(type, btn) {
+    doodleBrushType = type || 'pen';
+    document.querySelectorAll('.doodle-brush-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+  }
+
+  function getDoodleStrokeWidth(speed) {
+    if (doodleEraser) return doodleBrushSize * 1.5;
+    if (doodleBrushType === 'marker') return doodleBrushSize * 1.35;
+    if (doodleBrushType === 'pencil') return Math.max(1, doodleBrushSize * (0.65 + Math.min(0.45, speed * 0.1)));
+    return Math.max(1, doodleBrushSize * (1.05 - Math.min(0.45, speed * 0.12)));
+  }
+
+  function getDoodleBrushAlpha() {
+    if (doodleEraser) return 1;
+    if (doodleBrushType === 'marker') return 0.35;
+    if (doodleBrushType === 'pencil') return 0.55;
+    return 0.95;
+  }
+
+  function setDoodleColor(color) {
+    doodleBrushColor = color || '#c0392b';
+    doodleEraser = false;
+    var eraserBtn = document.getElementById('doodle-eraser-btn');
+    if (eraserBtn) eraserBtn.textContent = '橡皮擦';
+  }
+
+  function setDoodleSize(size) {
+    doodleBrushSize = Math.max(1, parseInt(size, 10) || 6);
+    var label = document.getElementById('doodle-size-label');
+    if (label) label.textContent = doodleBrushSize + 'px';
+  }
+
+  function toggleDoodleEraser() {
+    doodleEraser = !doodleEraser;
+    var eraserBtn = document.getElementById('doodle-eraser-btn');
+    if (eraserBtn) eraserBtn.textContent = doodleEraser ? '画笔模式' : '橡皮擦';
+  }
+
+  function clearDoodleCanvas() {
+    var canvas = document.getElementById('doodle-canvas');
+    if (!canvas || !doodleCtx) return;
+    doodleCtx.globalCompositeOperation = 'source-over';
+    doodleCtx.fillStyle = '#ffffff';
+    doodleCtx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function renderDoodleGallery() {
+    var el = document.getElementById('doodle-gallery');
+    if (!el) return;
+    if (!Array.isArray(doodlesData) || doodlesData.length === 0) {
+      el.innerHTML = '<div class="empty-state">🎨<p>还没有保存的涂鸦作品，开始创作吧！</p></div>';
+      return;
+    }
+    var sorted = doodlesData.slice().sort(function(a, b){ return (b.id || 0) - (a.id || 0); });
+    el.innerHTML = sorted.map(function(item){
+      var title = item.title || ('涂鸦 ' + (item.id || ''));
+      return '<div class="doodle-card">' +
+        '<img src="' + item.dataUrl + '" alt="doodle">' +
+        '<div class="doodle-card-title">' + escapeHtml(title) + '</div>' +
+        '<div class="doodle-card-actions"><button onclick="openSavedDoodle(' + item.id + ')">继续编辑</button><button onclick="downloadDoodle(' + item.id + ')">下载</button></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  async function saveDoodleImage() {
+    var canvas = document.getElementById('doodle-canvas');
+    if (!canvas) return;
+    var dataUrl = canvas.toDataURL('image/png');
+    var item = {
+      id: Date.now(),
+      title: '涂鸦作品 ' + formatDateGMT8() + ' ' + formatTimeGMT8(),
+      dataUrl: dataUrl,
+      createdAt: Date.now()
+    };
+    var existingIndex = doodlesData.findIndex(function(it){ return it.id === item.id; });
+    if (window.editingDoodleId) {
+      item.id = window.editingDoodleId;
+      existingIndex = doodlesData.findIndex(function(it){ return it.id === item.id; });
+    }
+    if (existingIndex >= 0) doodlesData[existingIndex] = item;
+    else doodlesData.push(item);
+    renderDoodleGallery();
+    try {
+      await apiFetch('/api/doodles', {
+        method: existingIndex >= 0 ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      window.editingDoodleId = item.id;
+      alert('涂鸦已保存！');
+    } catch (e) {
+      alert('保存失败，请稍后再试。');
+    }
+  }
+
+  function openSavedDoodle(id) {
+    var item = doodlesData.find(function(it){ return it.id === id; });
+    if (!item) return;
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.getElementById('doodle-canvas');
+      if (!canvas) return;
+      initDoodleBoard();
+      doodleCtx.globalCompositeOperation = 'source-over';
+      doodleCtx.fillStyle = '#ffffff';
+      doodleCtx.fillRect(0, 0, canvas.width, canvas.height);
+      doodleCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      window.editingDoodleId = id;
+      showView('doodle', document.querySelector("button[data-view='doodle']"));
+    };
+    img.src = item.dataUrl;
+  }
+
+  function downloadDoodle(id) {
+    var item = doodlesData.find(function(it){ return it.id === id; });
+    if (!item) return;
+    var a = document.createElement('a');
+    a.href = item.dataUrl;
+    a.download = (item.title || 'doodle') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  async function searchBooksOnline() {
+    var input = document.getElementById('book-search-input');
+    var q = (input && input.value || '').trim();
+    var resultsEl = document.getElementById('bookshelf-search-results');
+    if (!resultsEl) return;
+    if (!q) {
+      resultsEl.innerHTML = '<div class="backup-note">请输入关键词后再搜索。</div>';
+      return;
+    }
+    resultsEl.innerHTML = '<div class="backup-note">搜索中...</div>';
+    try {
+      var res = await apiFetch('/api/book-search?q=' + encodeURIComponent(q));
+      var items = Array.isArray(res.items) ? res.items : [];
+      if (items.length === 0) {
+        resultsEl.innerHTML = '<div class="backup-note">没有找到可下载的 EPUB 结果。</div>';
         return;
       }
-      var config = {
-        args: [],
-        canvas: canvas,
-        executable: '/godot/slingshot/slingshot',
-        mainPack: '/godot/slingshot/slingshot.pck'
+      resultsEl.innerHTML = items.map(function(it, idx){
+        return '<div class="book-search-item">' +
+          '<div><div style="font-weight:600;font-size:0.85rem;">' + escapeHtml(it.title) + '</div><div style="font-size:0.78rem;color:var(--muted);">' + escapeHtml(it.author || '未知作者') + '</div></div>' +
+          '<button onclick="downloadSearchedEpub(' + idx + ')">下载并导入</button>' +
+        '</div>';
+      }).join('');
+      window._bookSearchItems = items;
+    } catch (e) {
+      resultsEl.innerHTML = '<div class="backup-note">搜索失败，请稍后重试。</div>';
+    }
+  }
+
+  async function downloadSearchedEpub(index) {
+    var items = window._bookSearchItems || [];
+    var it = items[index];
+    if (!it || !it.epubUrl) return;
+    try {
+      var resp = await fetch(it.epubUrl);
+      if (!resp.ok) throw new Error('下载失败');
+      var blob = await resp.blob();
+      var arrayBuffer = await blob.arrayBuffer();
+      var bookId = Date.now();
+      await saveBookFile(bookId, arrayBuffer);
+      var meta = {
+        id: bookId,
+        title: it.title || '未知书名',
+        author: it.author || '',
+        cover: it.coverUrl || '',
+        progress: 0,
+        currentCfi: '',
+        lastRead: formatDateGMT8(),
       };
-      var engine = new Engine(config);
-      Promise.resolve(engine.startGame({})).catch(function(err) {
-        console.error('Godot init failed:', err);
-        showGodotFallback('弹弓加载失败，请刷新');
+      booksData.push(meta);
+      await apiFetch('/api/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(meta)
       });
+      renderBookshelf();
+      alert('已下载并导入《' + meta.title + '》');
+    } catch (e) {
+      alert('下载导入失败，请稍后重试。');
+    }
+  }
+
+  function loadDoodleBaseImage(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.getElementById('doodle-canvas');
+        if (!canvas) return;
+        initDoodleBoard();
+        var scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        var w = Math.round(img.width * scale);
+        var h = Math.round(img.height * scale);
+        var x = Math.round((canvas.width - w) / 2);
+        var y = Math.round((canvas.height - h) / 2);
+        doodleCtx.globalCompositeOperation = 'source-over';
+        doodleCtx.fillStyle = '#ffffff';
+        doodleCtx.fillRect(0, 0, canvas.width, canvas.height);
+        doodleCtx.drawImage(img, x, y, w, h);
+      };
+      img.src = ev.target.result;
     };
-    script.onerror = function() {
-      showGodotFallback('弹弓加载失败，请刷新');
-    };
-    document.body.appendChild(script);
+    reader.readAsDataURL(file);
+  }
+
+  function launchTripleFireworks() {
+    if (fireworksRunning) return;
+    var canvas = document.getElementById('fireworks-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    fireworksRunning = true;
+    canvas.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var colors = ['#ff4d4f', '#ffd666', '#40a9ff', '#73d13d', '#9254de', '#ff85c0', '#ffa940', '#36cfc9'];
+    var particles = [];
+    var rockets = [];
+    var gravity = 0.045;
+    var friction = 0.985;
+    var audioCtx = null;
+
+    function getAudioCtx() {
+      try {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (e) {}
+      return audioCtx;
+    }
+
+    function playWhoosh() {
+      var ac = getAudioCtx();
+      if (!ac) return;
+      var now = ac.currentTime;
+      var osc = ac.createOscillator();
+      var gain = ac.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220 + Math.random() * 80, now);
+      osc.frequency.exponentialRampToValueAtTime(60 + Math.random() * 20, now + 0.35);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.07, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      osc.connect(gain).connect(ac.destination);
+      osc.start(now);
+      osc.stop(now + 0.38);
+    }
+
+    function playBurst() {
+      var ac = getAudioCtx();
+      if (!ac) return;
+      var now = ac.currentTime;
+      var noiseBuffer = ac.createBuffer(1, ac.sampleRate * 0.22, ac.sampleRate);
+      var data = noiseBuffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+      var src = ac.createBufferSource();
+      src.buffer = noiseBuffer;
+      var gain = ac.createGain();
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      src.connect(gain).connect(ac.destination);
+      src.start(now);
+      src.stop(now + 0.25);
+    }
+
+    function burst(cx, cy, count, baseColor, spreadBoost) {
+      playBurst();
+      for (var i = 0; i < count; i++) {
+        var a = (Math.PI * 2 * i) / count + Math.random() * 0.12;
+        var speed = 2.8 + Math.random() * (4.8 + (spreadBoost || 0));
+        particles.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          life: 70 + Math.random() * 30,
+          age: 0,
+          color: baseColor || colors[(Math.random() * colors.length) | 0],
+          size: 1.8 + Math.random() * 2.8,
+        });
+      }
+    }
+
+    function launchRocket(startX, delayMs, wave) {
+      setTimeout(function() {
+        playWhoosh();
+        var waveFactor = 1 + wave * 0.28;
+        rockets.push({
+          x: startX,
+          y: canvas.height + 10,
+          vx: (Math.random() - 0.5) * (1.2 + wave * 0.2),
+          vy: -(6.8 + Math.random() * 1.4) * waveFactor,
+          targetY: canvas.height * (0.18 + Math.random() * 0.2),
+          color: colors[(Math.random() * colors.length) | 0],
+          trail: [],
+          wave: wave,
+        });
+      }, delayMs);
+    }
+
+    function launchWave(wave, baseDelay) {
+      launchRocket(canvas.width * 0.2, baseDelay + 0, wave);
+      launchRocket(canvas.width * 0.5, baseDelay + 180, wave);
+      launchRocket(canvas.width * 0.8, baseDelay + 360, wave);
+    }
+
+    // 三轮烟花：一轮比一轮更盛大
+    launchWave(0, 0);
+    launchWave(1, 1300);
+    launchWave(2, 2700);
+
+    var start = performance.now();
+    function tick() {
+      ctx.fillStyle = 'rgba(3, 8, 20, 0.16)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (var r = rockets.length - 1; r >= 0; r--) {
+        var rk = rockets[r];
+        rk.vy += gravity * 0.08;
+        rk.x += rk.vx;
+        rk.y += rk.vy;
+        rk.trail.push({ x: rk.x, y: rk.y, a: 1 });
+        if (rk.trail.length > 12) rk.trail.shift();
+
+        for (var t = 0; t < rk.trail.length; t++) {
+          var tr = rk.trail[t];
+          var ta = (t + 1) / rk.trail.length;
+          ctx.globalAlpha = 0.14 * ta;
+          ctx.fillStyle = rk.color;
+          ctx.beginPath();
+          ctx.arc(tr.x, tr.y, 1.5 + ta, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(rk.x, rk.y, 2.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (rk.y <= rk.targetY || rk.vy > -0.6) {
+          var count = 120 + rk.wave * 55;
+          var spread = rk.wave * 1.7;
+          burst(rk.x, rk.y, count, rk.color, spread);
+          // 额外副爆：后两轮更盛大
+          if (rk.wave >= 1) {
+            burst(rk.x + (Math.random() - 0.5) * 40, rk.y + (Math.random() - 0.5) * 24, 60 + rk.wave * 25, colors[(Math.random() * colors.length) | 0], 1 + rk.wave);
+          }
+          if (rk.wave >= 2) {
+            burst(rk.x + (Math.random() - 0.5) * 70, rk.y + (Math.random() - 0.5) * 36, 80, colors[(Math.random() * colors.length) | 0], 2.4);
+          }
+          rockets.splice(r, 1);
+        }
+      }
+
+      for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.age += 1;
+        if (p.age >= p.life) {
+          particles.splice(i, 1);
+          continue;
+        }
+        p.vx *= friction;
+        p.vy = p.vy * friction + gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        var alpha = 1 - p.age / p.life;
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      if (particles.length > 0 || rockets.length > 0 || performance.now() - start < 5600) {
+        requestAnimationFrame(tick);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.display = 'none';
+        fireworksRunning = false;
+      }
+    }
+
+    requestAnimationFrame(tick);
   }
 
   // ─── Initialize ───
@@ -4928,6 +5568,15 @@
     });
   }
 
+  var doodleUploadEl = document.getElementById('doodle-upload-input');
+  if (doodleUploadEl) {
+    doodleUploadEl.addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      loadDoodleBaseImage(file);
+      e.target.value = '';
+    });
+  }
+
   applyRandomQuote();
   initPointerAmbient();
   var editorEl = document.getElementById('editor-area');
@@ -4941,6 +5590,7 @@
   initTopNavFallback();
 
   loadAllData();
+  initDoodleBoard();
 
   // Init photo wall background settings on page load
   setTimeout(function() {
