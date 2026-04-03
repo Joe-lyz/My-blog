@@ -21,6 +21,9 @@ const memoryKV = {
   async put(key, value) {
     memoryState.set(key, value);
   },
+  async delete(key) {
+    memoryState.delete(key);
+  },
 };
 
 function createD1Store(db) {
@@ -42,6 +45,9 @@ function createD1Store(db) {
         .prepare("INSERT INTO blog_kv(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")
         .bind(key, value)
         .run();
+    },
+    async delete(key) {
+      await db.prepare("DELETE FROM blog_kv WHERE key = ?").bind(key).run();
     },
   };
 }
@@ -94,6 +100,15 @@ export async function readKVJson(env, key, fallbackValue) {
 
 export async function writeKVJson(env, key, value) {
   await (await getStore(env)).put(key, JSON.stringify(value));
+}
+
+export async function deleteKVKey(env, key) {
+  const store = await getStore(env);
+  if (typeof store.delete === "function") {
+    await store.delete(key);
+    return;
+  }
+  await store.put(key, "null");
 }
 
 export async function parseJsonBody(request) {
