@@ -259,6 +259,130 @@
       padding: 0.5rem 0 0.5rem 1.2rem; color: var(--muted); font-style: italic;
     }
     .post-body img { max-width: 100%; height: auto; border-radius: 3px; margin: 0.5rem 0; }
+    .post-body.hidden-by-egg { display: none; }
+    .special-diary-egg {
+      margin-bottom: 1.5rem;
+      border: 1px dashed #f0bfaf;
+      border-radius: 12px;
+      padding: 1rem;
+      background: linear-gradient(180deg, #fff7f2 0%, #fffdf9 100%);
+      position: relative;
+    }
+    .egg-chip {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: #9f6e63;
+      background: #ffe9de;
+      border: 1px solid #ffd5c3;
+      border-radius: 999px;
+      padding: 0.12rem 0.6rem;
+      margin-bottom: 0.7rem;
+    }
+    .egg-text p { margin: 0.35rem 0; line-height: 1.85; }
+    .egg-inline-status { color: #c7745f; font-size: 0.85rem; }
+    .egg-bottom-notice {
+      margin-top: 0.9rem;
+      border-top: 1px dashed #f0cfbe;
+      padding-top: 0.65rem;
+      color: #8c7164;
+      font-size: 0.9rem;
+    }
+    .egg-actions { margin-top: 0.9rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .egg-btn {
+      border: 1px solid #e4b5a3;
+      background: #fff;
+      color: #7e5447;
+      border-radius: 8px;
+      padding: 0.34rem 0.78rem;
+      cursor: pointer;
+    }
+    .egg-btn.primary { background: #f08d73; color: #fff; border-color: #f08d73; }
+    .egg-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+    .egg-skip-btn {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      border: none;
+      background: transparent;
+      color: #b48b7c;
+      cursor: pointer;
+      font-size: 0.76rem;
+    }
+    .egg-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 248, 244, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+    .egg-overlay.show { display: flex; }
+    .egg-modal {
+      width: min(92%, 360px);
+      background: #fff;
+      border: 1px solid #f4d3c4;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 8px 20px rgba(139, 98, 84, 0.16);
+    }
+    .egg-modal h3 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.05rem;
+      margin-bottom: 0.55rem;
+    }
+    .egg-modal ul {
+      margin: 0 0 0.75rem 1.2rem;
+      color: #70564b;
+      line-height: 1.7;
+    }
+    .egg-modal p { margin: 0.45rem 0; color: #70564b; }
+    .egg-progress {
+      margin: 0.3rem 0 0.7rem;
+      height: 8px;
+      border-radius: 999px;
+      background: #f9dfd7;
+      overflow: hidden;
+    }
+    .egg-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f3a89f, #e97a74);
+    }
+    .egg-smash {
+      margin: 0.35rem 0 0.6rem;
+      font-size: 1.2rem;
+      animation: eggShake 0.35s ease-in-out 2;
+    }
+    .egg-log {
+      border: 1px dashed #f0c8b8;
+      border-radius: 8px;
+      padding: 0.45rem 0.6rem;
+      margin-bottom: 0.4rem;
+      background: #fff8f5;
+    }
+    .egg-bill {
+      border: 1px dashed #f0c8b8;
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      margin-top: 0.7rem;
+      background: #fff8f5;
+    }
+    .egg-mystery-mask {
+      margin-top: 0.55rem;
+      font-size: 0.78rem;
+      color: #8b6e63;
+      animation: eggFlicker 0.9s ease-in-out 2;
+    }
+    @keyframes eggShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    @keyframes eggFlicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
 
     /* ─── Write View ─── */
     .write-form { max-width: 640px; }
@@ -1909,6 +2033,7 @@
         <h1 id="detail-title"></h1>
       </div>
     </div>
+    <div id="special-diary-egg"></div>
     <div class="post-body" id="detail-body"></div>
   </div>
 
@@ -1922,9 +2047,10 @@
       </div>
       <div class="form-group">
         <label>分类</label>
-        <select id="input-type">
+        <select id="input-type" onchange="handleTypeChange()">
           <option value="blog">博客 -- 分享想法与经历</option>
           <option value="diary">日记 -- 私人记录</option>
+          <option value="special-diary-egg">愚人节彩蛋 -- 特殊日记互动页</option>
         </select>
       </div>
       <div class="form-group">
@@ -2309,7 +2435,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 <script>
   // ─── State ───
-  var APP_BUILD = "2026-03-02-b386d2a-hotfix";
+  var APP_BUILD = "愚人节特供版";
   var posts = [];
   var deletedPosts = [];
   var profile = { name: '我的名字', bio: '欢迎来到我的小角落。这里是我记录生活、分享想法的地方。\n喜欢文字、旅行和一切有趣的事物。', avatar: '' };
@@ -2337,6 +2463,16 @@
   var splashReady = false;
   var plannerPage = "daily";
   var writeStartedAt = 0;
+  var specialDiaryEggState = {
+    active: false,
+    step: 0,
+    branch: '',
+    finaleMode: '',
+    randomLine: '',
+    typewriterCache: {}
+  };
+  var specialDiaryTypeTimer = 0;
+  var specialDiaryTypeToken = 0;
 
   // Photo edit state
   var editingPhotoId = null;
@@ -2443,6 +2579,390 @@
     var hero = document.getElementById('hero-quote-en');
     if (splash) splash.textContent = q;
     if (hero) hero.textContent = '"' + q + '"';
+  }
+
+  function normalizeSpecialDiaryTitle(text) {
+    return String(text || '')
+      .trim()
+      .replace(/[“”"'「」『』《》\s]/g, '')
+      .toLowerCase();
+  }
+
+  function shouldTriggerSpecialDiary(post) {
+    if (!post) return false;
+    var normalized = normalizeSpecialDiaryTitle(post.title);
+    return normalized === '特殊日记' || normalized.indexOf('特殊日记') >= 0;
+  }
+
+  function resolvePostType(rawType) {
+    return rawType === 'special-diary-egg' ? 'diary' : rawType;
+  }
+
+  function getPostTypeLabel(type) {
+    return type === 'blog' ? '博客' : '日记';
+  }
+
+  function handleTypeChange() {
+    var typeEl = document.getElementById('input-type');
+    var titleEl = document.getElementById('input-title');
+    var editor = document.getElementById('editor-area');
+    if (!typeEl || typeEl.value !== 'special-diary-egg') return;
+    if (titleEl && !titleEl.value.trim()) titleEl.value = '特殊日记';
+    if (editor && !editor.textContent.trim()) {
+      editor.innerHTML = '<p>（保留这个标题即可触发愚人节彩蛋互动）</p>';
+    }
+  }
+
+  function resetSpecialDiaryTyping() {
+    if (specialDiaryTypeTimer) clearInterval(specialDiaryTypeTimer);
+    specialDiaryTypeTimer = 0;
+  }
+
+  function typewriterText(element, text, key, onDone) {
+    if (!element) return;
+    resetSpecialDiaryTyping();
+    var token = ++specialDiaryTypeToken;
+    var saved = specialDiaryEggState.typewriterCache[key];
+    if (saved === text) {
+      element.textContent = text;
+      if (onDone) onDone();
+      return;
+    }
+    var index = 0;
+    element.textContent = '';
+    specialDiaryTypeTimer = setInterval(function() {
+      if (token !== specialDiaryTypeToken) {
+        resetSpecialDiaryTyping();
+        return;
+      }
+      index += 1;
+      element.textContent = text.slice(0, index);
+      if (index >= text.length) {
+        specialDiaryEggState.typewriterCache[key] = text;
+        resetSpecialDiaryTyping();
+        if (onDone) onDone();
+      }
+    }, 50);
+  }
+
+  function hideSpecialDiaryEgg(restoreBody) {
+    resetSpecialDiaryTyping();
+    specialDiaryEggState.active = false;
+    specialDiaryEggState.step = 0;
+    specialDiaryEggState.branch = '';
+    specialDiaryEggState.finaleMode = '';
+    specialDiaryEggState.randomLine = '';
+    specialDiaryEggState.typewriterCache = {};
+    specialDiaryEggState.introFlavor = '';
+    specialDiaryEggState.smashShell = false;
+    specialDiaryEggState.transientNote = '';
+    specialDiaryEggState.transientMode = '';
+    specialDiaryEggState.step4Branch = '';
+    specialDiaryEggState.step5Note = '';
+    specialDiaryEggState.readMode = '';
+    specialDiaryEggState.showBill = false;
+    specialDiaryEggState.step9Who = false;
+    specialDiaryEggState.step9Moved = false;
+    var host = document.getElementById('special-diary-egg');
+    var body = document.getElementById('detail-body');
+    if (host) host.innerHTML = '';
+    if (restoreBody !== false && body) body.classList.remove('hidden-by-egg');
+  }
+
+  function startSpecialDiaryEgg() {
+    specialDiaryEggState.active = true;
+    specialDiaryEggState.step = 1;
+    specialDiaryEggState.branch = '';
+    specialDiaryEggState.finaleMode = '';
+    specialDiaryEggState.randomLine = '';
+    specialDiaryEggState.typewriterCache = {};
+    specialDiaryEggState.introFlavor = '';
+    specialDiaryEggState.smashShell = false;
+    specialDiaryEggState.transientNote = '';
+    specialDiaryEggState.transientMode = '';
+    specialDiaryEggState.step4Branch = '';
+    specialDiaryEggState.step5Note = '';
+    specialDiaryEggState.readMode = '';
+    specialDiaryEggState.showBill = false;
+    specialDiaryEggState.step9Who = false;
+    specialDiaryEggState.step9Moved = false;
+    renderSpecialDiaryEgg();
+  }
+
+  function specialDiaryNextStep(nextStep) {
+    specialDiaryEggState.step = nextStep;
+    renderSpecialDiaryEgg();
+  }
+
+  function pickSpecialDiaryRandomLine() {
+    if (specialDiaryEggState.randomLine) return specialDiaryEggState.randomLine;
+    var candidates = [
+      '系统检测到你有点可爱，允许重复阅读。',
+      '别急，下一次更新可能真的要收费：一百个亲亲。',
+      '继续停留在这里当然不可以，请回到笼子里。',
+      '你已经获得隐藏成就：愿意陪一个小彩蛋走到最后的人。'
+    ];
+    var idx = Math.floor(Math.random() * candidates.length);
+    specialDiaryEggState.randomLine = candidates[idx] || candidates[0];
+    return specialDiaryEggState.randomLine;
+  }
+
+  function focusSpecialDiaryPrimary() {
+    setTimeout(function() {
+      var host = document.getElementById('special-diary-egg');
+      if (!host) return;
+      var target = host.querySelector('[data-egg-primary="1"]');
+      if (target) target.focus();
+    }, 20);
+  }
+
+  function specialDiaryAction(action) {
+    if (!specialDiaryEggState.active) return;
+    if (action === 'skip' || action === 'close') return hideSpecialDiaryEgg(true);
+    if (action === 'restart') return startSpecialDiaryEgg();
+
+    if (action === 'intro_continue') return specialDiaryNextStep(2);
+    if (action === 'intro_peek') {
+      specialDiaryEggState.introFlavor = '偷看失败，内容被龟壳挡住了。';
+      return specialDiaryNextStep(2);
+    }
+    if (action === 'intro_smash') {
+      specialDiaryEggState.introFlavor = '好的，将为你把龟壳锤烂。';
+      specialDiaryEggState.smashShell = true;
+      return specialDiaryNextStep(2);
+    }
+
+    if (action === 'step2_next') return specialDiaryNextStep(3);
+    if (action === 'step2_fun') {
+      specialDiaryEggState.transientNote = '大到可以下次惩罚你哟，小卡~。';
+      return specialDiaryNextStep(3);
+    }
+
+    if (action === 'step3_detail') return specialDiaryNextStep(4);
+    if (action === 'step3_update') {
+      specialDiaryEggState.transientMode = 'progress';
+      specialDiaryEggState.transientNote = '检测到大卡还没想好更新什么。';
+      return specialDiaryNextStep(4);
+    }
+    if (action === 'step3_rollback') {
+      specialDiaryEggState.transientMode = 'rollback';
+      specialDiaryEggState.transientNote = '别怕，让我们慢慢来~';
+      return specialDiaryNextStep(4);
+    }
+
+    if (action === 'step4_continue') return specialDiaryNextStep(5);
+    if (action === 'step4_trust') {
+      specialDiaryEggState.step4Branch = 'trust';
+      return renderSpecialDiaryEgg();
+    }
+    if (action === 'step4_log') {
+      specialDiaryEggState.step4Branch = 'log';
+      return renderSpecialDiaryEgg();
+    }
+
+    if (action === 'step5_open') return specialDiaryNextStep(6);
+    if (action === 'step5_passby') {
+      specialDiaryEggState.step5Note = '路过也算一种很认真的遇见。';
+      return specialDiaryNextStep(6);
+    }
+    if (action === 'step5_discount') {
+      specialDiaryEggState.step5Note = '可以，从 648 元优惠到 648 元。';
+      return specialDiaryNextStep(6);
+    }
+
+    if (action === 'pay') {
+      specialDiaryEggState.branch = 'pay';
+      return specialDiaryNextStep(7);
+    }
+    if (action === 'student') {
+      specialDiaryEggState.branch = 'student';
+      return specialDiaryNextStep(7);
+    }
+    if (action === 'face') {
+      specialDiaryEggState.branch = 'face';
+      return specialDiaryNextStep(7);
+    }
+    if (action === 'kiss') {
+      specialDiaryEggState.branch = 'kiss';
+      return specialDiaryNextStep(7);
+    }
+
+    if (action === 'mode_formal') {
+      specialDiaryEggState.readMode = 'formal';
+      return specialDiaryNextStep(8);
+    }
+    if (action === 'mode_fish') {
+      specialDiaryEggState.readMode = 'fish';
+      return specialDiaryNextStep(8);
+    }
+    if (action === 'mode_mystery') {
+      specialDiaryEggState.readMode = 'mystery';
+      return specialDiaryNextStep(8);
+    }
+
+    if (action === 'step8_bill') {
+      specialDiaryEggState.showBill = true;
+      return renderSpecialDiaryEgg();
+    }
+    if (action === 'step8_to9') return specialDiaryNextStep(9);
+
+    if (action === 'laugh') {
+      specialDiaryEggState.finaleMode = 'warm';
+      return specialDiaryNextStep(10);
+    }
+    if (action === 'cry') {
+      specialDiaryEggState.finaleMode = 'light';
+      pickSpecialDiaryRandomLine();
+      return specialDiaryNextStep(10);
+    }
+    if (action === 'who') {
+      specialDiaryEggState.step9Who = true;
+      return renderSpecialDiaryEgg();
+    }
+    if (action === 'moved') {
+      specialDiaryEggState.step9Moved = true;
+      return renderSpecialDiaryEgg();
+    }
+    if (action === 'step9_to10_warm') {
+      specialDiaryEggState.finaleMode = 'warm';
+      return specialDiaryNextStep(10);
+    }
+  }
+
+  function renderSpecialDiaryEgg() {
+    var host = document.getElementById('special-diary-egg');
+    var body = document.getElementById('detail-body');
+    if (!host || !body || !specialDiaryEggState.active) return;
+    body.classList.add('hidden-by-egg');
+    var step = specialDiaryEggState.step;
+    var html = '<section class="special-diary-egg" aria-live="polite">' +
+      '<button class="egg-skip-btn" onclick="specialDiaryAction(\'skip\')" aria-label="跳过彩蛋">跳过彩蛋</button>' +
+      '<div class="egg-chip">伪系统更新向导 · 日记小剧场</div><div class="egg-text">';
+
+    if (step === 1) {
+      html += '<p>正在解密今日内容……</p><p>请保持一点点期待。</p>';
+      html += '</div><div class="egg-actions">' +
+        '<button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'intro_continue\')">继续</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'intro_peek\')">先偷看一眼</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'intro_smash\')">一锤把你龟龟壳锤烂</button></div>';
+    } else if (step === 2) {
+      if (specialDiaryEggState.introFlavor) html += '<p class="egg-inline-status">' + specialDiaryEggState.introFlavor + '</p>';
+      html += '<p id="egg-typed-line"></p>';
+      html += '</div><div class="egg-actions">' +
+        '<button id="egg-step-btn" class="egg-btn primary" data-egg-primary="1" disabled onclick="specialDiaryAction(\'step2_next\')">下一句</button>' +
+        '<button id="egg-fun-btn" class="egg-btn" disabled onclick="specialDiaryAction(\'step2_fun\')">到底多大，哎嘿</button></div>';
+    } else if (step === 3) {
+      if (specialDiaryEggState.transientNote) html += '<p class="egg-inline-status">' + specialDiaryEggState.transientNote + '</p>';
+      html += '<p id="egg-typed-line"></p><p class="egg-inline-status">检测到重要更新包</p>';
+      html += '</div><div class="egg-actions">' +
+        '<button id="egg-step-btn" class="egg-btn primary" data-egg-primary="1" disabled onclick="specialDiaryAction(\'step3_detail\')">查看详情</button>' +
+        '<button id="egg-direct-btn" class="egg-btn" disabled onclick="specialDiaryAction(\'step3_update\')">直接更新</button>' +
+        '<button id="egg-rollback-btn" class="egg-btn" disabled onclick="specialDiaryAction(\'step3_rollback\')">回退到旧版本</button></div>';
+    } else if (step === 5) {
+      html += '<p>让我想想要更新什么内容。</p>';
+      html += '<div class="egg-bottom-notice"><p>阅读到一半，检测到高级内容。</p><p>继续阅读需开通大卡VIP权限。</p></div>';
+      html += '</div><div class="egg-actions">' +
+        '<button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'step5_open\')">去开通</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'step5_passby\')">我只是路过</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'step5_discount\')">能打折吗</button></div>';
+    } else if (step === 8) {
+      if (specialDiaryEggState.readMode === 'formal') {
+        html += '<p>本次充值提示纯纯免费。</p><p>只是想认真逗你一下。</p>';
+      } else if (specialDiaryEggState.readMode === 'fish') {
+        html += '<p>钱是真的要，记得转账给我。</p><p>偷偷逗你一下。</p>';
+      } else {
+        html += '<p>你刚刚通过了一场并不存在的权限验证。</p><p>恭喜你成功完成服从性测试~桀桀~</p>';
+        html += '<div class="egg-mystery-mask">神秘模式加载中…</div>';
+      }
+      if (specialDiaryEggState.showBill) {
+        html += '<div class="egg-bill"><p>套路费：0 元</p><p>好奇心服务费：0 元</p><p>愉快阅读补贴：-648 元</p><p>总计：请继续开心</p></div>';
+      }
+      html += '</div><div class="egg-actions">' +
+        '<button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'step8_to9\')">那真正的内容呢</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'step8_bill\')">我还想再查一下账单</button></div>';
+    } else if (step === 9) {
+      html += '<p>真正想更新的内容是：</p><p>愚人节快乐呀~小卡~</p><p>想你也快乐。</p>';
+      if (specialDiaryEggState.step9Who) html += '<p class="egg-inline-status">当然是我们的好朋友！</p>';
+      if (specialDiaryEggState.step9Moved) html += '<p class="egg-inline-status">那这次更新就没有白发生。</p>';
+      html += '</div><div class="egg-actions">' +
+        '<button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'laugh\')">笑了一下</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'cry\')">哭了一下</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'who\')">这是谁想出来的</button>' +
+        '<button class="egg-btn" onclick="specialDiaryAction(\'moved\')">我其实有点感动</button>';
+      if (specialDiaryEggState.step9Who || specialDiaryEggState.step9Moved) {
+        html += '<button class="egg-btn" onclick="specialDiaryAction(\'step9_to10_warm\')">进入结尾</button>';
+      }
+      html += '</div>';
+    } else if (step === 10) {
+      if (specialDiaryEggState.finaleMode === 'light') {
+        html += '<p>' + pickSpecialDiaryRandomLine() + '</p>';
+        html += '</div><div class="egg-actions">' +
+          '<button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'close\')">关闭彩蛋</button>' +
+          '<button class="egg-btn" onclick="specialDiaryAction(\'restart\')">重新体验一次</button></div>';
+      } else {
+        html += '<p>那今天的更新就算成功了。</p><p>愿你接下来看到的，都是好消息。</p>';
+        html += '</div><div class="egg-actions"><button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'close\')">关闭彩蛋</button></div>';
+      }
+    } else {
+      html += '<p>正在载入剧情...</p></div>';
+    }
+
+    if (step === 4 || step === 6 || step === 7) {
+      html += '<div class="egg-overlay show" role="dialog" aria-modal="true">';
+      if (step === 4) {
+        html += '<div class="egg-modal"><h3>更新内容预览</h3>';
+        if (specialDiaryEggState.transientMode === 'progress') {
+          html += '<div class="egg-progress"><div class="egg-progress-bar" style="width:12%"></div></div>';
+        }
+        if (specialDiaryEggState.transientNote) html += '<p>' + specialDiaryEggState.transientNote + '</p>';
+        html += '<ul><li>优化深夜胡思乱想模块</li><li>修复若干拖延问题</li><li>提升想你时的响应速度</li><li>优化了喝酒喝不醉的BUG</li></ul>';
+        if (specialDiaryEggState.smashShell) html += '<div class="egg-smash">🐢💥👊</div>';
+        if (specialDiaryEggState.step4Branch === 'trust') {
+          html += '<p>目前已通过大卡的想太多测试。</p>';
+        } else if (specialDiaryEggState.step4Branch === 'log') {
+          html += '<div class="egg-log"><p>v0.0.1 学会胡思乱想</p><p>v0.8.2 学会深夜不睡</p><p>v1.0.0 学会把想念装进文字里</p></div>';
+        }
+        html += '<div class="egg-actions"><button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'step4_continue\')">继续阅读</button><button class="egg-btn" onclick="specialDiaryAction(\'step4_trust\')">这些更新靠谱吗</button><button class="egg-btn" onclick="specialDiaryAction(\'step4_log\')">我想看完整日志</button></div></div>';
+      } else if (step === 6) {
+        html += '<div class="egg-modal"><h3>高级阅读权限</h3><p>继续阅读需充值 648 元</p>';
+        if (specialDiaryEggState.step5Note) html += '<p>' + specialDiaryEggState.step5Note + '</p>';
+        html += '<div class="egg-actions"><button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'pay\')">立刻充值</button><button class="egg-btn" onclick="specialDiaryAction(\'student\')">我是穷学生</button><button class="egg-btn" onclick="specialDiaryAction(\'face\')">可以刷脸吗</button><button class="egg-btn" onclick="specialDiaryAction(\'kiss\')">我拿**付款</button></div></div>';
+      } else {
+        html += '<div class="egg-modal">';
+        if (specialDiaryEggState.branch === 'pay') {
+          html += '<p>正在连接你的财富系统……</p><p>连接失败：检测到你是认真来看我的，不收钱。</p>';
+        } else if (specialDiaryEggState.branch === 'student') {
+          html += '<p>审核通过。</p><p>已为你自动领取「真诚访问补贴」。</p>';
+        } else if (specialDiaryEggState.branch === 'face') {
+          html += '<p>刷脸失败。</p><p>但系统认为你看起来不像会真的付 648。</p>';
+        } else {
+          html += '<p>支付方式验证中……</p><p>验证通过：**属于免手续费通道。</p>';
+        }
+        html += '<p>权限申请已通过。请选择你的阅读模式：</p><div class="egg-actions"><button class="egg-btn primary" data-egg-primary="1" onclick="specialDiaryAction(\'mode_formal\')">认真模式</button><button class="egg-btn" onclick="specialDiaryAction(\'mode_fish\')">摸鱼模式</button><button class="egg-btn" onclick="specialDiaryAction(\'mode_mystery\')">神秘模式</button></div></div>';
+      }
+      html += '</div>';
+    }
+    html += '</section>';
+    host.innerHTML = html;
+
+    if (step === 2) {
+      typewriterText(document.getElementById('egg-typed-line'), '今天有大事发生，', 'line1', function() {
+        var btn = document.getElementById('egg-step-btn');
+        if (btn) btn.disabled = false;
+        var extra = document.getElementById('egg-fun-btn');
+        if (extra) extra.disabled = false;
+      });
+    } else if (step === 3) {
+      typewriterText(document.getElementById('egg-typed-line'), '本 blog 要更新版本了，', 'line2', function() {
+        var btn = document.getElementById('egg-step-btn');
+        if (btn) btn.disabled = false;
+        var b1 = document.getElementById('egg-direct-btn');
+        var b2 = document.getElementById('egg-rollback-btn');
+        if (b1) b1.disabled = false;
+        if (b2) b2.disabled = false;
+      });
+    }
+    focusSpecialDiaryPrimary();
   }
 
 
@@ -2689,7 +3209,7 @@
         '<div class="post-date">' +
           safePost.date.replace(/-/g, '/') + timeStr +
           '<br>' +
-          '<span class="post-tag tag-' + safePost.type + '">' + (safePost.type === 'blog' ? '博客' : '日记') + '</span>' +
+          '<span class="post-tag tag-' + safePost.type + '">' + getPostTypeLabel(safePost.type) + '</span>' +
         '</div>' +
         '<div>' +
           '<div class="post-title">' + escapeHtml(safePost.title) + '</div>' +
@@ -2804,16 +3324,19 @@
     var post = posts.find(function(p) { return p.id === id; });
     if (!post) return;
     post = normalizePost(post);
+    hideSpecialDiaryEgg(false);
     currentPostId = id;
     var timeStr = post.time ? ' ' + post.time : '';
     document.getElementById('detail-meta').textContent =
-      post.date + timeStr + '  \u00B7  ' + (post.type === 'blog' ? '博客' : '日记');
+      post.date + timeStr + '  \u00B7  ' + getPostTypeLabel(post.type);
     document.getElementById('detail-title').textContent = post.title;
     document.getElementById('detail-body').innerHTML = post.body;
 
     document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
     document.getElementById('post-view').classList.add('active');
     currentView = 'post';
+    if (shouldTriggerSpecialDiary(post)) startSpecialDiaryEgg();
+    else hideSpecialDiaryEgg(true);
   }
 
   // ─── Edit Current Post ───
@@ -2823,7 +3346,7 @@
 
     editingPostId = post.id;
     document.getElementById('input-title').value = post.title;
-    document.getElementById('input-type').value = post.type;
+    document.getElementById('input-type').value = shouldTriggerSpecialDiary(post) ? 'special-diary-egg' : post.type;
     document.getElementById('editor-area').innerHTML = post.body;
     document.getElementById('write-label').textContent = '编辑文章';
     document.getElementById('submit-btn').innerHTML = '更新文章 &#8594;';
@@ -2892,7 +3415,7 @@
 
   async function publishPost() {
     var title = document.getElementById('input-title').value.trim();
-    var type  = document.getElementById('input-type').value;
+    var type  = resolvePostType(document.getElementById('input-type').value);
     var editor = document.getElementById('editor-area');
     var bodyHtml = editor.innerHTML.trim();
 
@@ -2961,6 +3484,7 @@
     }
 
     document.getElementById('input-title').value = '';
+    document.getElementById('input-type').value = 'blog';
     editor.innerHTML = '';
     resetWriteTimer();
     showView('list', document.querySelectorAll('nav button')[0]);
@@ -2968,6 +3492,7 @@
 
   // ─── Go Back ───
   function goBack() {
+    hideSpecialDiaryEgg(true);
     showView('list', document.querySelectorAll('nav button')[0]);
   }
 
@@ -2993,6 +3518,7 @@
       document.getElementById('cancel-edit-btn').style.display = 'none';
       resetWriteTimer();
     }
+    if (name !== 'post') hideSpecialDiaryEgg(true);
   }
 
   function showSlingshotFallback(message) {
