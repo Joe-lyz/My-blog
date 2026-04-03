@@ -18,6 +18,10 @@ class InMemoryKV {
   async put(key, value) {
     this.map.set(key, value);
   }
+
+  async delete(key) {
+    this.map.delete(key);
+  }
 }
 
 class MockD1 {
@@ -49,6 +53,10 @@ class MockD1 {
             if (sql.startsWith("INSERT INTO blog_kv")) {
               const [key, value] = args;
               db.map.set(key, value);
+            }
+            if (sql.startsWith("DELETE FROM blog_kv WHERE key = ?")) {
+              const [key] = args;
+              db.map.delete(key);
             }
             return { success: true };
           },
@@ -105,6 +113,44 @@ test("posts API recovers if existing data type is corrupted", async () => {
   assert.equal(Array.isArray(getRes.body), true);
   assert.equal(getRes.body.length, 1);
   assert.equal(getRes.body[0].id, 2);
+});
+
+
+
+test("posts API migrates legacy posts storage to split-key format", async () => {
+  const env = makeEnv();
+  const legacyPosts = [
+    { id: 11, title: "old-1", body: "a" },
+    { id: 12, title: "old-2", body: "b" },
+  ];
+  await env.BLOG_DATA.put("posts", JSON.stringify(legacyPosts));
+
+  const getRes = await call(env, "/api/posts");
+  assert.equal(getRes.status, 200);
+  assert.equal(getRes.body.length, 2);
+  assert.equal(getRes.body[0].id, 11);
+
+  const rawIndex = await env.BLOG_DATA.get("posts:index", { type: "json" });
+  assert.deepEqual(rawIndex, ["11", "12"]);
+  const rawPost11 = await env.BLOG_DATA.get("posts:item:11", { type: "json" });
+  assert.equal(rawPost11.title, "old-1");
+});
+
+test("posts API delete removes post item key", async () => {
+  const env = makeEnv();
+  await call(env, "/api/posts", "POST", { id: 77, title: "to-delete", body: "x" });
+
+  const beforeDelete = await env.BLOG_DATA.get("posts:item:77", { type: "json" });
+  assert.equal(beforeDelete.title, "to-delete");
+
+  const delRes = await call(env, "/api/posts", "DELETE", { id: 77 });
+  assert.equal(delRes.status, 200);
+
+  const afterDelete = await env.BLOG_DATA.get("posts:item:77");
+  assert.equal(afterDelete, null);
+
+  const getRes = await call(env, "/api/posts");
+  assert.equal(getRes.body.length, 0);
 });
 
 test("photos API can save and read photos", async () => {
