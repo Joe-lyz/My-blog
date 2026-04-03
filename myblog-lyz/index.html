@@ -2055,9 +2055,10 @@
       </div>
       <div class="form-group">
         <label>分类</label>
-        <select id="input-type">
+        <select id="input-type" onchange="handleTypeChange()">
           <option value="blog">博客 -- 分享想法与经历</option>
           <option value="diary">日记 -- 私人记录</option>
+          <option value="special-diary-egg">愚人节彩蛋 -- 特殊日记互动页</option>
         </select>
       </div>
       <div class="form-group">
@@ -2554,6 +2555,30 @@
     return normalized === '特殊日记' || normalized.indexOf('特殊日记') >= 0;
   }
 
+  function resolvePostType(rawType) {
+    // 写作入口提供“愚人节彩蛋”选项，落库仍归类为 diary，避免破坏既有统计/样式逻辑。
+    return rawType === 'special-diary-egg' ? 'diary' : rawType;
+  }
+
+  function getPostTypeLabel(type) {
+    return type === 'blog' ? '博客' : '日记';
+  }
+
+  function handleTypeChange() {
+    var typeEl = document.getElementById('input-type');
+    var titleEl = document.getElementById('input-title');
+    var editor = document.getElementById('editor-area');
+    if (!typeEl) return;
+
+    if (typeEl.value !== 'special-diary-egg') return;
+    if (titleEl && !titleEl.value.trim()) {
+      titleEl.value = '特殊日记';
+    }
+    if (editor && !editor.textContent.trim()) {
+      editor.innerHTML = '<p>（保留这个标题即可触发愚人节彩蛋互动）</p>';
+    }
+  }
+
   function resetSpecialDiaryTyping() {
     if (specialDiaryTypeTimer) clearInterval(specialDiaryTypeTimer);
     specialDiaryTypeTimer = 0;
@@ -2928,7 +2953,7 @@
         '<div class="post-date">' +
           p.date.replace(/-/g, '/') + timeStr +
           '<br>' +
-          '<span class="post-tag tag-' + p.type + '">' + (p.type === 'blog' ? '博客' : '日记') + '</span>' +
+          '<span class="post-tag tag-' + p.type + '">' + getPostTypeLabel(p.type) + '</span>' +
         '</div>' +
         '<div>' +
           '<div class="post-title">' + escapeHtml(p.title) + '</div>' +
@@ -3046,7 +3071,7 @@
     currentPostId = id;
     var timeStr = post.time ? ' ' + post.time : '';
     document.getElementById('detail-meta').textContent =
-      post.date + timeStr + '  \u00B7  ' + (post.type === 'blog' ? '博客' : '日记');
+      post.date + timeStr + '  \u00B7  ' + getPostTypeLabel(post.type);
     document.getElementById('detail-title').textContent = post.title;
     document.getElementById('detail-body').innerHTML = post.body;
 
@@ -3064,7 +3089,7 @@
 
     editingPostId = post.id;
     document.getElementById('input-title').value = post.title;
-    document.getElementById('input-type').value = post.type;
+    document.getElementById('input-type').value = shouldTriggerSpecialDiary(post) ? 'special-diary-egg' : post.type;
     document.getElementById('editor-area').innerHTML = post.body;
     document.getElementById('write-label').textContent = '编辑文章';
     document.getElementById('submit-btn').innerHTML = '更新文章 &#8594;';
@@ -3133,7 +3158,7 @@
 
   async function publishPost() {
     var title = document.getElementById('input-title').value.trim();
-    var type  = document.getElementById('input-type').value;
+    var type  = resolvePostType(document.getElementById('input-type').value);
     var editor = document.getElementById('editor-area');
     var bodyHtml = editor.innerHTML.trim();
 
@@ -3202,6 +3227,7 @@
     }
 
     document.getElementById('input-title').value = '';
+    document.getElementById('input-type').value = 'blog';
     editor.innerHTML = '';
     resetWriteTimer();
     showView('list', document.querySelectorAll('nav button')[0]);
