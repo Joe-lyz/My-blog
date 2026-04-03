@@ -209,6 +209,7 @@
     }
     .tag-blog { background: #fde8e6; color: var(--accent); }
     .tag-diary { background: #e6f0fd; color: #2563eb; }
+    .tag-special { background: #f3e8ff; color: #7e22ce; }
     .post-title {
       font-family: 'Noto Serif SC', serif;
       font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; line-height: 1.5;
@@ -259,6 +260,53 @@
       padding: 0.5rem 0 0.5rem 1.2rem; color: var(--muted); font-style: italic;
     }
     .post-body img { max-width: 100%; height: auto; border-radius: 3px; margin: 0.5rem 0; }
+
+    .special-diary-box {
+      border: 1px dashed #d8b4fe;
+      border-radius: 8px;
+      background: #fcf8ff;
+      padding: 1.1rem 1rem;
+    }
+    .special-diary-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+      color: #6b21a8;
+    }
+    .special-line {
+      min-height: 1.8rem;
+      color: #3f3f46;
+    }
+    .special-paywall {
+      margin-top: 0.9rem;
+      border-top: 1px solid #e9d5ff;
+      padding-top: 0.9rem;
+    }
+    .special-paywall-msg {
+      font-weight: 600;
+      color: #b91c1c;
+      margin-bottom: 0.7rem;
+    }
+    .special-paywall-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .special-paywall-btn {
+      border: 1px solid #c4b5fd;
+      background: #fff;
+      color: #6d28d9;
+      border-radius: 5px;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .special-paywall-btn:hover { background: #f5f3ff; }
+    .special-paywall-result {
+      color: #7c3aed;
+      font-weight: 600;
+      margin-top: 0.35rem;
+    }
 
     /* ─── Write View ─── */
     .write-form { max-width: 640px; }
@@ -1925,6 +1973,7 @@
         <select id="input-type">
           <option value="blog">博客 -- 分享想法与经历</option>
           <option value="diary">日记 -- 私人记录</option>
+          <option value="special">特殊日记 -- 愚人节彩蛋</option>
         </select>
       </div>
       <div class="form-group">
@@ -2638,7 +2687,7 @@
     var post = raw && typeof raw === 'object' ? Object.assign({}, raw) : {};
     var now = new Date();
     if (!post.id) post.id = Date.now() + Math.floor(Math.random() * 1000);
-    post.type = post.type === 'blog' ? 'blog' : 'diary';
+    post.type = (post.type === 'blog' || post.type === 'diary' || post.type === 'special') ? post.type : 'diary';
     if (typeof post.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(post.date)) {
       var parsedDate = post.date ? new Date(post.date) : now;
       post.date = isNaN(parsedDate.getTime()) ? formatDateGMT8(now) : formatDateGMT8(parsedDate);
@@ -2661,6 +2710,12 @@
   function ensurePostsArray(raw) {
     if (!Array.isArray(raw)) return [];
     return raw.map(function(item) { return normalizePost(item); });
+  }
+
+  function getPostTypeLabel(type) {
+    if (type === 'blog') return '博客';
+    if (type === 'special') return '特殊日记';
+    return '日记';
   }
 
   // ─── Render Post List ───
@@ -2689,7 +2744,7 @@
         '<div class="post-date">' +
           safePost.date.replace(/-/g, '/') + timeStr +
           '<br>' +
-          '<span class="post-tag tag-' + safePost.type + '">' + (safePost.type === 'blog' ? '博客' : '日记') + '</span>' +
+          '<span class="post-tag tag-' + safePost.type + '">' + getPostTypeLabel(safePost.type) + '</span>' +
         '</div>' +
         '<div>' +
           '<div class="post-title">' + escapeHtml(safePost.title) + '</div>' +
@@ -2807,13 +2862,73 @@
     currentPostId = id;
     var timeStr = post.time ? ' ' + post.time : '';
     document.getElementById('detail-meta').textContent =
-      post.date + timeStr + '  \u00B7  ' + (post.type === 'blog' ? '博客' : '日记');
+      post.date + timeStr + '  \u00B7  ' + getPostTypeLabel(post.type);
     document.getElementById('detail-title').textContent = post.title;
-    document.getElementById('detail-body').innerHTML = post.body;
+    if (post.type === 'special') {
+      renderSpecialDiaryEasterEgg();
+    } else {
+      document.getElementById('detail-body').innerHTML = post.body;
+    }
 
     document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
     document.getElementById('post-view').classList.add('active');
     currentView = 'post';
+  }
+
+  function renderSpecialDiaryEasterEgg() {
+    var detailBody = document.getElementById('detail-body');
+    detailBody.innerHTML =
+      '<div class="special-diary-box">' +
+        '<div class="special-diary-title">特殊日记 · 仅限今日阅读</div>' +
+        '<div id="special-lines"></div>' +
+        '<div class="special-paywall" id="special-paywall" style="display:none;">' +
+          '<div class="special-paywall-msg">继续阅读需充值 648 元</div>' +
+          '<div class="special-paywall-actions">' +
+            '<button class="special-paywall-btn" onclick="resolveSpecialPaywall()">立刻充值</button>' +
+            '<button class="special-paywall-btn" onclick="resolveSpecialPaywall()">我是穷学生</button>' +
+          '</div>' +
+          '<div class="special-paywall-result" id="special-paywall-result"></div>' +
+        '</div>' +
+      '</div>';
+
+    var lines = [
+      '今天有大事发生，',
+      '本blog要更新版本了，',
+      '让我想想要更新什么内容'
+    ];
+    var lineWrap = document.getElementById('special-lines');
+    var index = 0;
+
+    function typeLine() {
+      if (index >= lines.length) return;
+      var lineEl = document.createElement('div');
+      lineEl.className = 'special-line';
+      lineWrap.appendChild(lineEl);
+      var text = lines[index];
+      var i = 0;
+      var timer = setInterval(function() {
+        i += 1;
+        lineEl.textContent = text.slice(0, i);
+        if (i >= text.length) {
+          clearInterval(timer);
+          index += 1;
+          if (index === 2) {
+            document.getElementById('special-paywall').style.display = 'block';
+            return;
+          }
+          setTimeout(typeLine, 260);
+        }
+      }, 90);
+    }
+
+    typeLine();
+  }
+
+  function resolveSpecialPaywall() {
+    var result = document.getElementById('special-paywall-result');
+    if (!result) return;
+    result.textContent = '愚人节快乐，想你也快乐';
+    alert('愚人节快乐，想你也快乐');
   }
 
   // ─── Edit Current Post ───
