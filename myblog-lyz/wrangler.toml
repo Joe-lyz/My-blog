@@ -5,8 +5,3 @@ compatibility_date = "2026-01-01"
 [assets]
 directory = "public"
 binding = "ASSETS"
-
-[[r2_buckets]]
-binding = "LOVE_MEDIA"
-bucket_name = "my-blog-love-media"
-preview_bucket_name = "my-blog-love-media"

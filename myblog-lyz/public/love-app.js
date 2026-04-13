@@ -246,8 +246,8 @@
       : file.type.startsWith("audio/") ? "audio"
       : null;
     if (!mediaType) return Promise.resolve(null);
-    if (file.size > 8 * 1024 * 1024) {
-      alert((file.name || "文件") + " 超过 8MB，已跳过。");
+    if (file.size > 4 * 1024 * 1024) {
+      alert((file.name || "文件") + " 超过 4MB（free plan 限制），已跳过。");
       return Promise.resolve(null);
     }
     return new Promise((resolve, reject) => {
