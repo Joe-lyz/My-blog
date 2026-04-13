@@ -1,5 +1,5 @@
 (function () {
-  const { useEffect, useMemo, useState } = React;
+  const { useEffect, useMemo, useState, Fragment } = React;
   const html = htm.bind(React.createElement);
   const TZ = "Asia/Shanghai";
   const STORAGE_KEY = "love_memorial_v1";
@@ -155,7 +155,7 @@
                   const rec = records[key];
                   const special = key === "2026-02-17" || key === "2026-04-25";
                   const isToday = key === dayKey(now);
-                  return html`<button className=${"cell " + (special?"special":"") + (isToday?" today":"")} onClick=${() => setEditing({ key, ...(rec || { special:false, tags:[], mood:3, note:"" }) })}><span className="d">${Number(key.slice(-2))}</span>${rec ? html`<span className="dot"></span><span className="tag">${(rec.tags||[])[0] || "已记"}</span>`:""}</button>`;
+                  return html`<button type="button" className=${"cell " + (special?"special":"") + (isToday?" today":"")} onClick=${() => setEditing({ key, ...(rec || { special:false, tags:[], mood:3, note:"", media: [] }) })}><span className="d">${Number(key.slice(-2))}</span>${rec ? html`<span className="dot"></span><span className="tag">${(rec.tags||[])[0] || "已记"}</span>`:""}</button>`;
                 })}
                 </div>
               </div>` : html`<div className="timeline">${timeline.map(([k,v]) => html`<div className="timeline-item"><div><b>${k}</b> · 心情 ${v.mood || 3}/5</div><div className="meta">${(v.tags||[]).join(" · ") || "无标签"}</div><div>${v.note || "（无备注）"}</div></div>`)}</div>`}
@@ -180,7 +180,7 @@
         </div>
 
         <aside className=${"drawer " + (editing ? "open" : "") }>
-          ${editing ? html`<>
+          ${editing ? html`<${Fragment}>
             <h3 style=${{fontFamily:'Cormorant Garamond, serif'}}>记录 ${editing.key}</h3>
             <label className="meta"><input type="checkbox" checked=${editing.special} onChange=${(e)=>setEditing({...editing, special:e.target.checked})} /> 今天有特别的事</label>
             <div className="tag-grid">${EVENT_TAGS.map(tag => html`<button className=${"chip " + ((editing.tags||[]).includes(tag)?"on":"")} onClick=${() => {
@@ -191,14 +191,64 @@
             <div className="meta">心情：${editing.mood || 3}/5</div>
             <input className="field" type="range" min="1" max="5" value=${editing.mood || 3} onInput=${(e) => setEditing({ ...editing, mood: Number(e.target.value) })} />
             <textarea value=${editing.note || ""} onInput=${(e) => setEditing({ ...editing, note: e.target.value })} placeholder="写下今天的小事..." />
+            <div className="meta" style=${{marginTop:"8px"}}>添加图片 / 视频 / 音频</div>
+            <input className="field" type="file" accept="image/*,video/*,audio/*" multiple onChange=${(e) => attachMediaFiles(e, editing, setEditing)} />
+            <div className="media-grid">
+              ${((editing.media || [])).map((item, idx) => html`
+                <div className="media-card">
+                  <button type="button" className="media-remove" onClick=${() => {
+                    const next = [...(editing.media || [])];
+                    next.splice(idx, 1);
+                    setEditing({ ...editing, media: next });
+                  }}>×</button>
+                  ${item.type === "image" ? html`<img src=${item.dataUrl} alt=${item.name || "image"} />` : ""}
+                  ${item.type === "video" ? html`<video src=${item.dataUrl} controls></video>` : ""}
+                  ${item.type === "audio" ? html`<audio src=${item.dataUrl} controls></audio>` : ""}
+                </div>
+              `)}
+            </div>
             <div className="toolbar">
               <button className="btn" onClick=${() => { setRecords({ ...records, [editing.key]: { ...editing, updatedAt: new Date().toISOString() } }); setEditing(null); }}>保存</button>
               <button className="btn" onClick=${() => { const n={...records}; delete n[editing.key]; setRecords(n); setEditing(null); }}>删除</button>
               <button className="btn" onClick=${() => setEditing(null)}>关闭</button>
             </div>
-          </>` : ""}
+          <//>` : ""}
         </aside>
       </div>`;
+  }
+
+  function attachMediaFiles(event, editing, setEditing) {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    Promise.all(files.map(toMediaItem)).then((items) => {
+      const next = [...(editing.media || []), ...items.filter(Boolean)];
+      setEditing({ ...editing, media: next.slice(0, 12) });
+      event.target.value = "";
+    });
+  }
+
+  function toMediaItem(file) {
+    if (!file || !file.type) return Promise.resolve(null);
+    const mediaType = file.type.startsWith("image/") ? "image"
+      : file.type.startsWith("video/") ? "video"
+      : file.type.startsWith("audio/") ? "audio"
+      : null;
+    if (!mediaType) return Promise.resolve(null);
+    if (file.size > 8 * 1024 * 1024) {
+      alert((file.name || "文件") + " 超过 8MB，已跳过。");
+      return Promise.resolve(null);
+    }
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({
+        id: Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+        type: mediaType,
+        name: file.name,
+        dataUrl: String(reader.result || ""),
+      });
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
   }
 
   function exportData(records, type) {
