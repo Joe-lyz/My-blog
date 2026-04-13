@@ -1932,6 +1932,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/love-app.css">
 </head>
 <body>
 
@@ -1973,6 +1974,7 @@
       <button data-view="backup" onclick="showView('backup', this)">备份日记</button>
       <button data-view="reader" onclick="showView('reader', this)">阅读</button>
       <button data-view="about" onclick="showView('about', this)">关于我</button>
+      <button data-view="love" onclick="showView('love', this)">恋爱纪念站</button>
     </nav>
   </div>
 </header>
@@ -2357,6 +2359,11 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- 恋爱纪念站 -->
+  <div id="love-view" class="view">
+    <div id="love-react-root" class="love-shell-loading" style="padding:24px;color:#c8cfdd;">正在加载恋爱纪念站...</div>
   </div>
 
 </main>
@@ -3540,6 +3547,7 @@
     if (name === 'about') { renderProfile(); }
     if (name === 'backup') { renderBackupPostList(); }
     if (name === 'reader') { renderBookshelf(); }
+    if (name === 'love' && typeof window.initLoveMemorial === 'function') { window.initLoveMemorial(); }
     if (name === 'write' && !editingPostId) {
       document.getElementById('write-label').textContent = '写一篇新文章';
       document.getElementById('submit-btn').innerHTML = '发布文章 &#8594;';
@@ -4171,7 +4179,12 @@
 
     var safeJson = JSON.stringify(payload).replace(/<\//g, '<\\/');
     html += '<script id="diary-backup-json" type="application/json">' + safeJson + '<\/script>'; 
-    html += '</body></html>';
+    html += '
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="/love-app.js"></script>
+</body></html>';
 
     var blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
     var a = document.createElement('a');
