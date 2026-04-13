@@ -8,6 +8,8 @@ import { onRequest as doodlesHandler } from "./functions/api/doodles.js";
 import { onRequest as bookSearchHandler } from "./functions/api/book-search.js";
 import { onRequest as booksHandler } from "./functions/api/books.js";
 import { onRequest as trashHandler } from "./functions/api/trash.js";
+import { onRequest as loveRecordsHandler } from "./functions/api/love-records.js";
+import { onRequest as loveMediaHandler } from "./functions/api/love-media.js";
 
 const BUILD_VERSION = "2026-03-02-b386d2a-hotfix";
 
@@ -21,6 +23,7 @@ const routes = {
   "/api/book-search": bookSearchHandler,
   "/api/books": booksHandler,
   "/api/trash": trashHandler,
+  "/api/love-records": loveRecordsHandler,
   "/api/version": async () => json({ version: BUILD_VERSION }),
   "/api/health": async ({ env }) => {
     const storeMode = detectStoreMode(env);
@@ -42,6 +45,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const handler = routes[url.pathname];
+
+    if (url.pathname.startsWith("/api/love-media")) {
+      return loveMediaHandler({ request, env, ctx, params: { key: url.pathname.replace(/^\/api\/love-media\/?/, "") } });
+    }
 
     if (handler) {
       return handler({ request, env, ctx });

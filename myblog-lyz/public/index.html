@@ -1888,6 +1888,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/love-app.css">
 </head>
 <body>
 
@@ -1930,6 +1931,7 @@
       <button data-view="doodle" onclick="showView('doodle', this)">涂鸦板</button>
       <button data-view="reader" onclick="showView('reader', this)">阅读</button>
       <button data-view="about" onclick="showView('about', this)">关于我</button>
+      <button data-view="love" onclick="showView('love', this)">恋爱纪念站</button>
     </nav>
   </div>
 </header>
@@ -2339,6 +2341,11 @@
     </div>
   </div>
 
+  <!-- 恋爱纪念站 -->
+  <div id="love-view" class="view">
+    <div id="love-react-root" style="padding:24px;color:#c8cfdd;">正在加载恋爱纪念站...</div>
+  </div>
+
 </main>
 </div>
 
@@ -2432,7 +2439,7 @@
 
 <script>
   // ─── State ───
-  var APP_BUILD = "愚人节特供版";
+  var APP_BUILD = "小卡生日特供版";
   var posts = [];
   var deletedPosts = [];
   var profile = { name: '我的名字', bio: '欢迎来到我的小角落。这里是我记录生活、分享想法的地方。\n喜欢文字、旅行和一切有趣的事物。', avatar: '' };
@@ -3569,6 +3576,7 @@
     if (name === 'backup') { renderBackupPostList(); }
     if (name === 'doodle') { initDoodleBoard(); renderDoodleGallery(); }
     if (name === 'reader') { renderBookshelf(); }
+    if (name === 'love' && typeof window.initLoveMemorial === 'function') { window.initLoveMemorial(); }
     if (name === 'write' && !editingPostId) {
       document.getElementById('write-label').textContent = '写一篇新文章';
       document.getElementById('submit-btn').innerHTML = '发布文章 &#8594;';
@@ -6232,5 +6240,9 @@
     initPwBgFromSettings();
   }, 100);
 </script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="/love-app.js"></script>
 </body>
 </html>
