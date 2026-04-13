@@ -56,6 +56,7 @@
       return { y: d.getFullYear(), m: d.getMonth() };
     });
     const [editing, setEditing] = useState(null);
+    const [uploadState, setUploadState] = useState({ total: 0, loaded: 0, active: false, message: "" });
     const [filter, setFilter] = useState("all");
     const [view, setView] = useState("calendar");
 
@@ -192,18 +193,20 @@
             <input className="field" type="range" min="1" max="5" value=${editing.mood || 3} onInput=${(e) => setEditing({ ...editing, mood: Number(e.target.value) })} />
             <textarea value=${editing.note || ""} onInput=${(e) => setEditing({ ...editing, note: e.target.value })} placeholder="写下今天的小事..." />
             <div className="meta" style=${{marginTop:"8px"}}>添加图片 / 视频 / 音频</div>
-            <input className="field" type="file" accept="image/*,video/*,audio/*" multiple onChange=${(e) => attachMediaFiles(e, editing, setEditing)} />
+            <input className="field" type="file" accept="image/*,video/*,audio/*" multiple onChange=${(e) => attachMediaFiles(e, editing, setEditing, setUploadState)} />
+            <div className="meta" style=${{marginTop:"6px"}}>媒体总量：${formatBytes((editing.media || []).reduce((sum, item) => sum + (item.size || 0), 0))}</div>
+            ${uploadState.active ? html`<div className="upload-block">
+              <div className="upload-line">上传进度：${Math.round((uploadState.loaded / Math.max(1, uploadState.total)) * 100)}% · ${formatBytes(uploadState.loaded)} / ${formatBytes(uploadState.total)}</div>
+              <div className="upload-track"><div className="upload-fill" style=${{width: ((uploadState.loaded / Math.max(1, uploadState.total)) * 100) + "%"}}></div></div>
+              <div className="meta">${uploadState.message}</div>
+            </div>` : ""}
             <div className="media-grid">
               ${((editing.media || [])).map((item, idx) => html`
                 <div className="media-card">
-                  <button type="button" className="media-remove" onClick=${() => {
-                    const next = [...(editing.media || [])];
-                    next.splice(idx, 1);
-                    setEditing({ ...editing, media: next });
-                  }}>×</button>
-                  ${item.type === "image" ? html`<img src=${item.dataUrl} alt=${item.name || "image"} />` : ""}
-                  ${item.type === "video" ? html`<video src=${item.dataUrl} controls></video>` : ""}
-                  ${item.type === "audio" ? html`<audio src=${item.dataUrl} controls></audio>` : ""}
+                  <button type="button" className="media-remove" onClick=${() => removeMediaItem(item, editing, setEditing)}>×</button>
+                  ${item.type === "image" ? html`<img src=${item.url || item.dataUrl} alt=${item.name || "image"} />` : ""}
+                  ${item.type === "video" ? html`<div className="media-placeholder">视频封面占位</div><video src=${item.url || item.dataUrl} controls></video>` : ""}
+                  ${item.type === "audio" ? html`<div className="audio-wave-placeholder"></div><audio src=${item.url || item.dataUrl} controls></audio>` : ""}
                 </div>
               `)}
             </div>
@@ -217,17 +220,26 @@
       </div>`;
   }
 
-  function attachMediaFiles(event, editing, setEditing) {
+  function attachMediaFiles(event, editing, setEditing, setUploadState) {
     const files = Array.from(event.target.files || []);
     if (!files.length) return;
-    Promise.all(files.map(toMediaItem)).then((items) => {
+    const total = files.reduce((sum, file) => sum + (file.size || 0), 0);
+    let loaded = 0;
+    setUploadState({ total, loaded: 0, active: true, message: "开始上传..." });
+    Promise.all(files.map((file) => uploadFileToR2(file, function (delta, name) {
+      loaded += delta;
+      setUploadState({ total, loaded, active: true, message: "上传中：" + name });
+    }))).then((items) => {
       const next = [...(editing.media || []), ...items.filter(Boolean)];
       setEditing({ ...editing, media: next.slice(0, 12) });
+      setUploadState({ total, loaded: total, active: false, message: "上传完成" });
       event.target.value = "";
+    }).catch((error) => {
+      setUploadState({ total, loaded, active: false, message: "上传失败：" + (error && error.message ? error.message : "未知错误") });
     });
   }
 
-  function toMediaItem(file) {
+  function uploadFileToR2(file, onChunk) {
     if (!file || !file.type) return Promise.resolve(null);
     const mediaType = file.type.startsWith("image/") ? "image"
       : file.type.startsWith("video/") ? "video"
@@ -238,17 +250,59 @@
       alert((file.name || "文件") + " 超过 8MB，已跳过。");
       return Promise.resolve(null);
     }
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve({
-        id: Date.now() + "_" + Math.random().toString(36).slice(2, 8),
-        type: mediaType,
-        name: file.name,
-        dataUrl: String(reader.result || ""),
-      });
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const xhr = new XMLHttpRequest();
+      let last = 0;
+      xhr.upload.onprogress = function (event) {
+        const loaded = event && typeof event.loaded === "number" ? event.loaded : 0;
+        const delta = Math.max(0, loaded - last);
+        last = loaded;
+        onChunk(delta, file.name || "文件");
+      };
+      xhr.open("POST", "/api/love-media", true);
+      xhr.onload = function () {
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(new Error("上传失败(" + xhr.status + ")"));
+          return;
+        }
+        try {
+          const payload = JSON.parse(xhr.responseText || "{}");
+          resolve({
+            id: payload.key || Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+            key: payload.key,
+            type: mediaType,
+            name: payload.name || file.name,
+            url: payload.url,
+            size: payload.size || file.size || 0,
+          });
+        } catch (error) {
+          reject(error);
+        }
+      };
+      xhr.onerror = () => reject(new Error("网络错误"));
+      xhr.send(formData);
     });
+  }
+
+  function removeMediaItem(item, editing, setEditing) {
+    const next = (editing.media || []).filter((m) => m !== item);
+    setEditing({ ...editing, media: next });
+    if (item && item.key) {
+      fetch("/api/love-media/" + encodeURIComponent(item.key), { method: "DELETE" }).catch(function () {});
+    }
+  }
+
+  function formatBytes(size) {
+    const units = ["B", "KB", "MB", "GB"];
+    let value = Number(size || 0);
+    let idx = 0;
+    while (value >= 1024 && idx < units.length - 1) {
+      value = value / 1024;
+      idx += 1;
+    }
+    return value.toFixed(idx === 0 ? 0 : 1) + " " + units[idx];
   }
 
   function exportData(records, type) {
