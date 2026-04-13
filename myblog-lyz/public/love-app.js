@@ -194,6 +194,7 @@
             <textarea value=${editing.note || ""} onInput=${(e) => setEditing({ ...editing, note: e.target.value })} placeholder="写下今天的小事..." />
             <div className="meta" style=${{marginTop:"8px"}}>添加图片 / 视频 / 音频</div>
             <input className="field" type="file" accept="image/*,video/*,audio/*" multiple onChange=${(e) => attachMediaFiles(e, editing, setEditing, setUploadState)} />
+            <div className="meta" style=${{marginTop:"6px"}}>图片会先自动压缩（最长边 1920，JPEG 质量 0.78）再上传。</div>
             <div className="meta" style=${{marginTop:"6px"}}>媒体总量：${formatBytes((editing.media || []).reduce((sum, item) => sum + (item.size || 0), 0))}</div>
             ${uploadState.active ? html`<div className="upload-block">
               <div className="upload-line">上传进度：${Math.round((uploadState.loaded / Math.max(1, uploadState.total)) * 100)}% · ${formatBytes(uploadState.loaded)} / ${formatBytes(uploadState.total)}</div>
@@ -246,43 +247,95 @@
       : file.type.startsWith("audio/") ? "audio"
       : null;
     if (!mediaType) return Promise.resolve(null);
-    if (file.size > 4 * 1024 * 1024) {
-      alert((file.name || "文件") + " 超过 4MB（free plan 限制），已跳过。");
-      return Promise.resolve(null);
-    }
-    return new Promise((resolve, reject) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      const xhr = new XMLHttpRequest();
-      let last = 0;
-      xhr.upload.onprogress = function (event) {
-        const loaded = event && typeof event.loaded === "number" ? event.loaded : 0;
-        const delta = Math.max(0, loaded - last);
-        last = loaded;
-        onChunk(delta, file.name || "文件");
+    const prepareFile = mediaType === "image" ? compressImageFile(file) : Promise.resolve(file);
+    return prepareFile.then((readyFile) => {
+      if (readyFile.size > 4 * 1024 * 1024) {
+        alert((readyFile.name || "文件") + " 超过 4MB（free plan 限制），已跳过。");
+        return null;
+      }
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append("file", readyFile);
+        const xhr = new XMLHttpRequest();
+        let last = 0;
+        xhr.upload.onprogress = function (event) {
+          const loaded = event && typeof event.loaded === "number" ? event.loaded : 0;
+          const delta = Math.max(0, loaded - last);
+          last = loaded;
+          onChunk(delta, readyFile.name || "文件");
+        };
+        xhr.open("POST", "/api/love-media", true);
+        xhr.onload = function () {
+          if (xhr.status < 200 || xhr.status >= 300) {
+            reject(new Error("上传失败(" + xhr.status + ")"));
+            return;
+          }
+          try {
+            const payload = JSON.parse(xhr.responseText || "{}");
+            resolve({
+              id: payload.key || Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+              key: payload.key,
+              type: mediaType,
+              name: payload.name || readyFile.name,
+              url: payload.url,
+              size: payload.size || readyFile.size || 0,
+            });
+          } catch (error) {
+            reject(error);
+          }
+        };
+        xhr.onerror = () => reject(new Error("网络错误"));
+        xhr.send(formData);
+      });
+    });
+  }
+
+  function compressImageFile(file) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = function () {
+        img.src = String(reader.result || "");
       };
-      xhr.open("POST", "/api/love-media", true);
-      xhr.onload = function () {
-        if (xhr.status < 200 || xhr.status >= 300) {
-          reject(new Error("上传失败(" + xhr.status + ")"));
+      reader.onerror = function () {
+        resolve(file);
+      };
+      img.onload = function () {
+        const maxW = 1920;
+        const maxH = 1920;
+        const ratio = Math.min(1, maxW / img.width, maxH / img.height);
+        const width = Math.max(1, Math.round(img.width * ratio));
+        const height = Math.max(1, Math.round(img.height * ratio));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(file);
           return;
         }
-        try {
-          const payload = JSON.parse(xhr.responseText || "{}");
-          resolve({
-            id: payload.key || Date.now() + "_" + Math.random().toString(36).slice(2, 8),
-            key: payload.key,
-            type: mediaType,
-            name: payload.name || file.name,
-            url: payload.url,
-            size: payload.size || file.size || 0,
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          if (blob.size >= file.size) {
+            resolve(file);
+            return;
+          }
+          const ext = blob.type === "image/png" ? "png" : "jpg";
+          const compressed = new File([blob], (file.name || "image").replace(/\\.[^.]+$/, "") + "-compressed." + ext, {
+            type: blob.type,
+            lastModified: Date.now(),
           });
-        } catch (error) {
-          reject(error);
-        }
+          resolve(compressed);
+        }, "image/jpeg", 0.78);
       };
-      xhr.onerror = () => reject(new Error("网络错误"));
-      xhr.send(formData);
+      img.onerror = function () {
+        resolve(file);
+      };
+      reader.readAsDataURL(file);
     });
   }
 
