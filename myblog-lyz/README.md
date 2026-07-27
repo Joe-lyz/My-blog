@@ -10,6 +10,8 @@
 - `worker.js`：Worker 入口，路由 `/api/*` 到后端处理器，其他请求回退到静态资源。
 - `functions/api/*.js`：API 处理逻辑。
 - `functions/_lib/store.js`：存储与响应工具（优先 KV；未绑定 KV 时回退内存存储）。
+- `public/doodle-board.js`：分层画板、对象工具、历史记录、IndexedDB 自动保存和导出逻辑。
+- `public/doodle-board.css`：画板三层 Canvas 和工具栏样式。
 - `test/`：Worker API 的自动化测试。
 - `wrangler.toml`：Wrangler 配置（本地开发/手动部署用）。
 
@@ -77,7 +79,7 @@ npm run test
 则仓库根目录也需要 `wrangler.toml`，并指向：
 
 - `main = "myblog-lyz/worker.js"`
-- `assets.directory = "myblog-lyz"`
+- `assets.directory = "myblog-lyz/public"`
 
 否则会出现 `Missing entry-point to Worker script or to assets directory`。
 
@@ -91,3 +93,9 @@ npm run test
 3. 若版本不是最新，说明是旧部署或缓存：重新触发 deploy。
 
 > 现在 `public/index.html` 响应已设置 `Cache-Control: no-store`，可避免长期命中旧缓存。
+
+## 画板项目存储
+
+画板会在操作完成约 500ms 后自动保存到浏览器 IndexedDB，刷新页面会恢复最近项目。项目同时保存背景信息、可编辑对象、画布尺寸、预览图、版本号和更新时间，而不是只保存最终截图。
+
+`doodle-board.js` 中保留了云同步扩展点。接入跨设备同步时，建议由 Worker 将项目 JSON 与预览图写入 R2（`projects/{userId}/{projectId}.json`、`previews/{userId}/{projectId}.png`），并在 D1 中仅保存用户、项目、更新时间和 R2 地址等索引信息；当前站点没有用户登录或稳定的用户 ID，因此默认只启用本地恢复。

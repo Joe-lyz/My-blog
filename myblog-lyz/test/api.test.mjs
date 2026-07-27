@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 
 import worker from "../worker.js";
 
@@ -297,4 +298,16 @@ test("non-api requests are served by ASSETS", async () => {
   const res = await worker.fetch(request, env, {});
   assert.equal(res.status, 200);
   assert.equal(await res.text(), "asset");
+});
+
+test("drawing board keeps background, drawing, and preview on separate layers", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const script = await readFile(new URL("../public/doodle-board.js", import.meta.url), "utf8");
+
+  assert.match(html, /<canvas id="backgroundCanvas"/);
+  assert.match(html, /<canvas id="drawingCanvas"/);
+  assert.match(html, /<canvas id="overlayCanvas"/);
+  assert.match(script, /destination-out/);
+  assert.match(script, /indexedDB\.open/);
+  assert.match(script, /previewDataUrl/);
 });
