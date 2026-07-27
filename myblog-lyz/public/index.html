@@ -2376,10 +2376,11 @@
           <label>月份 <select id="travel-month-filter" aria-label="筛选月份"><option value="">全年</option></select></label>
           <button id="travel-edit-mode" aria-label="切换旅行编辑模式">编辑模式</button>
           <button class="travel-btn primary travel-admin-only" id="travel-add-trip" hidden>添加旅行</button>
+          <button class="travel-btn travel-admin-only" id="travel-draw-route" aria-label="用鼠标绘制曲线路线" hidden>绘制线路</button>
         </div>
       </header>
       <div class="travel-layout">
-        <div class="travel-map-column"><div id="travel-map" role="application" aria-label="中国旅行路线地图"></div><div class="travel-map-controls" aria-label="地图控制"><button id="travel-zoom-in" aria-label="放大地图">＋</button><button id="travel-zoom-out" aria-label="缩小地图">−</button><button id="travel-reset" aria-label="复位中国地图">⌂</button></div></div>
+        <div class="travel-map-column"><div id="travel-map" role="application" aria-label="中国旅行路线地图"></div><p id="travel-draw-hint" class="travel-draw-hint" hidden>按住鼠标并拖动绘制线路，松开鼠标完成；按 Esc 取消。</p><div class="travel-map-controls" aria-label="地图控制"><button id="travel-zoom-in" aria-label="放大地图">＋</button><button id="travel-zoom-out" aria-label="缩小地图">−</button><button id="travel-reset" aria-label="复位中国地图">⌂</button></div></div>
         <aside class="travel-side" aria-label="旅行时间线与地点记录"><div id="travel-stats" class="travel-stats"></div><div id="travel-timeline"></div><article id="travel-stop-card"></article></aside>
       </div>
     </section>

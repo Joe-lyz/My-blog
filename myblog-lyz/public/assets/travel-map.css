@@ -1,4 +1,6 @@
 #travel-view { max-width: 1320px; }
+nav button[data-view="travel"] { background:#e8f4ff; color:#1769aa; border:1px solid #8fc6ee; border-bottom-color:#8fc6ee; border-radius:999px; padding:.52rem 1rem; margin-bottom:.65rem; box-shadow:0 5px 12px rgba(30,111,170,.24), inset 0 1px 0 rgba(255,255,255,.9); font-weight:600; }
+nav button[data-view="travel"]:hover,nav button[data-view="travel"].active { background:#d9edff; color:#0b548e; border-color:#4d9bd1; box-shadow:0 7px 16px rgba(30,111,170,.32), inset 0 1px 0 #fff; transform:translateY(-1px); }
 .travel-shell { border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 94%, white); box-shadow: 0 8px 24px rgba(50,35,20,.06); }
 .travel-header { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; padding:1.25rem 1.4rem; border-bottom:1px solid var(--line); }
 .travel-kicker { color:var(--accent); font-size:.72rem; letter-spacing:.18em; }
@@ -12,7 +14,10 @@
 .travel-admin-only[hidden] { display:none !important; }
 .travel-layout { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(310px,.85fr); min-height:620px; }
 .travel-map-column { position:relative; border-right:1px solid var(--line); }
-#travel-map { height:620px; min-height:420px; background:#eee8dc; }
+#travel-map { height:620px; min-height:420px; background:radial-gradient(circle at 48% 42%,#fffaf0 0,#eee4d3 70%,#ddd0bd 100%); }
+.travel-draw-hint { position:absolute; z-index:600; left:50%; bottom:16px; transform:translateX(-50%); width:max-content; max-width:calc(100% - 2rem); padding:.55rem .85rem; background:#e8f4fff2; border:1px solid #6aaddb; box-shadow:0 4px 14px #285e7f33; color:#145b8e; font-size:.8rem; text-align:center; }
+.travel-map-column.is-drawing #travel-map { cursor:crosshair; }
+.china-map-label { color:#7b3029; font-family:'Songti SC','STSong',serif; font-size:1.25rem; font-weight:700; letter-spacing:.35em; text-shadow:0 1px 0 #fff; white-space:nowrap; }
 .travel-map-error,.travel-empty { display:grid; place-items:center; min-height:240px; padding:2rem; text-align:center; color:var(--muted); }
 .travel-map-controls { position:absolute; z-index:500; top:12px; right:12px; display:flex; flex-direction:column; box-shadow:0 2px 8px #38281926; }
 .travel-map-controls button { width:36px;height:36px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:1rem; }
