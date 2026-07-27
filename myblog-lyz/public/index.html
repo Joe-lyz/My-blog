@@ -1919,6 +1919,7 @@
   <div class="header-inner">
     <div class="site-title">创造时间的<span>琥珀</span></div>
     <nav>
+      <button data-view="travel" onclick="showView('travel', this)">旅行地图</button>
       <button class="active" data-view="list" onclick="showView('list', this)">全部文章</button>
       <button data-view="write" onclick="showView('write', this)">写新文章</button>
       <button data-view="backup" onclick="showView('backup', this)">备份日记</button>
@@ -1926,7 +1927,6 @@
       <button data-view="reader" onclick="showView('reader', this)">阅读</button>
       <button data-view="about" onclick="showView('about', this)">关于我</button>
       <button data-view="love" onclick="showView('love', this)">恋爱纪念站</button>
-      <button data-view="travel" onclick="showView('travel', this)">旅行地图</button>
     </nav>
   </div>
 </header>
@@ -3448,7 +3448,7 @@
     document.getElementById('submit-btn').innerHTML = '更新文章 &#8594;';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
 
-    showView('write', document.querySelectorAll('nav button')[1]);
+    showView('write', document.querySelector("nav button[data-view='write']"));
     resetWriteTimer();
   }
 
@@ -3461,7 +3461,7 @@
     document.getElementById('submit-btn').innerHTML = '发布文章 &#8594;';
     document.getElementById('cancel-edit-btn').style.display = 'none';
 
-    showView('list', document.querySelectorAll('nav button')[0]);
+    showView('list', document.querySelector("nav button[data-view='list']"));
     resetWriteTimer();
   }
 
@@ -3489,7 +3489,7 @@
       renderTrashBin();
       currentPostId = null;
       alert('文章已移入回收站。');
-      showView('list', document.querySelectorAll('nav button')[0]);
+      showView('list', document.querySelector("nav button[data-view='list']"));
     } catch (e) {
       alert('删除失败，请稍后再试。');
     }
@@ -3583,13 +3583,13 @@
     document.getElementById('input-type').value = 'blog';
     editor.innerHTML = '';
     resetWriteTimer();
-    showView('list', document.querySelectorAll('nav button')[0]);
+    showView('list', document.querySelector("nav button[data-view='list']"));
   }
 
   // ─── Go Back ───
   function goBack() {
     hideSpecialDiaryEgg(true);
-    showView('list', document.querySelectorAll('nav button')[0]);
+    showView('list', document.querySelector("nav button[data-view='list']"));
   }
 
   // ─── Switch View ───
