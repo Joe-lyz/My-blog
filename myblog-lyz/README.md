@@ -6,10 +6,11 @@
 
 ## 目录说明
 
-- `index.html`：前端页面（继续请求 `/api/*`）。
+- `public/`：实际部署的前端静态资源（页面继续请求 `/api/*`）。
 - `worker.js`：Worker 入口，路由 `/api/*` 到后端处理器，其他请求回退到静态资源。
-- `functions/api/*.js`：API 处理逻辑（posts/profile/calendar/todos/photos/books）。
+- `functions/api/*.js`：API 处理逻辑。
 - `functions/_lib/store.js`：存储与响应工具（优先 KV；未绑定 KV 时回退内存存储）。
+- `test/`：Worker API 的自动化测试。
 - `wrangler.toml`：Wrangler 配置（本地开发/手动部署用）。
 
 ## 一次性准备
@@ -89,4 +90,4 @@ npm run test
 2. 页面右下角会显示 `build ...` 版本号。
 3. 若版本不是最新，说明是旧部署或缓存：重新触发 deploy。
 
-> 现在 `index.html` 响应已设置 `Cache-Control: no-store`，可避免长期命中旧缓存。
+> 现在 `public/index.html` 响应已设置 `Cache-Control: no-store`，可避免长期命中旧缓存。
