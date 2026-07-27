@@ -2169,6 +2169,7 @@
             <canvas id="backgroundCanvas" aria-label="画板背景层"></canvas>
             <canvas id="drawingCanvas" aria-label="画板绘图层"></canvas>
             <canvas id="overlayCanvas" aria-label="画板预览和交互层"></canvas>
+            <div class="doodle-brush-cursor" id="doodle-brush-cursor" aria-hidden="true"></div>
           </div>
         </div>
       </div>
@@ -5699,7 +5700,7 @@
       return '<div class="doodle-card">' +
         '<img src="' + item.dataUrl + '" alt="doodle">' +
         '<div class="doodle-card-title">' + escapeHtml(title) + '</div>' +
-        '<div class="doodle-card-actions"><button onclick="openSavedDoodle(' + item.id + ')">继续编辑</button><button onclick="downloadDoodle(' + item.id + ')">下载</button></div>' +
+        '<div class="doodle-card-actions"><button onclick="openSavedDoodle(' + item.id + ')">继续编辑</button><button onclick="downloadDoodle(' + item.id + ')">下载</button><button class="danger" onclick="deleteSavedDoodle(' + item.id + ')">删除</button></div>' +
       '</div>';
     }).join('');
   }
@@ -5763,6 +5764,24 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  async function deleteSavedDoodle(id) {
+    var item = doodlesData.find(function(it){ return it.id === id; });
+    if (!item || !confirm('确定删除“' + (item.title || '这幅涂鸦') + '”吗？删除后无法恢复。')) return;
+    try {
+      await apiFetch('/api/doodles', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+      });
+      doodlesData = doodlesData.filter(function(it){ return it.id !== id; });
+      if (window.editingDoodleId === id) window.editingDoodleId = null;
+      renderDoodleGallery();
+    } catch (error) {
+      console.error('Failed to delete doodle:', error);
+      alert('删除失败，请稍后重试。');
+    }
   }
 
   async function searchBooksOnline() {

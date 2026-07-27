@@ -59,7 +59,7 @@
     tool: 'pen', color: '#c0392b', width: 6, opacity: 1,
     fill: false, fillColor: '#f8c8c4', dashed: false,
     activeObject: null, selectedId: null, pointerId: null,
-    view: { zoom: 1, x: 0, y: 0 }, backgroundImage: null
+    view: { zoom: 1, x: 0, y: 0 }, backgroundImage: null, brushCursor: null
   };
 
   function emptyProject() {
@@ -343,6 +343,21 @@
     state.pointerId = null;
   }
 
+  function updateBrushCursor(event) {
+    if (!state.brushCursor || (state.tool !== 'pen' && state.tool !== 'eraser')) return hideBrushCursor();
+    var p = point(event);
+    state.brushCursor.style.display = 'block';
+    state.brushCursor.style.left = p.x + 'px';
+    state.brushCursor.style.top = p.y + 'px';
+    state.brushCursor.style.width = state.width + 'px';
+    state.brushCursor.style.height = state.width + 'px';
+    state.brushCursor.style.backgroundColor = state.tool === 'pen' ? state.color : '';
+  }
+
+  function hideBrushCursor() {
+    if (state.brushCursor) state.brushCursor.style.display = 'none';
+  }
+
   function keyDown(event) {
     if (!state.initialized || !document.getElementById('doodle-view').classList.contains('active')) return;
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? redo() : undo(); }
@@ -408,10 +423,15 @@
     state.board = document.getElementById('drawing-board'); state.viewport = document.getElementById('doodle-viewport');
     if (!state.board) return;
     state.canvases = { background: document.getElementById('backgroundCanvas'), drawing: document.getElementById('drawingCanvas'), overlay: document.getElementById('overlayCanvas') };
+    state.brushCursor = document.getElementById('doodle-brush-cursor');
+    state.board.dataset.tool = state.tool;
     state.project = emptyProject(); state.initialized = true;
     resizeLayers();
     state.canvases.overlay.addEventListener('pointerdown', pointerDown);
     state.canvases.overlay.addEventListener('pointermove', pointerMove);
+    state.canvases.overlay.addEventListener('pointermove', updateBrushCursor);
+    state.canvases.overlay.addEventListener('pointerenter', updateBrushCursor);
+    state.canvases.overlay.addEventListener('pointerleave', hideBrushCursor);
     state.canvases.overlay.addEventListener('pointerup', pointerUp);
     state.canvases.overlay.addEventListener('pointercancel', pointerUp);
     state.viewport.addEventListener('wheel', wheel, { passive: false });
@@ -433,8 +453,8 @@
     wrap.addEventListener('click', function (event) { var button = event.target.closest('[data-color]'); if (button) { setColor(button.dataset.color); document.getElementById('doodle-color').value = button.dataset.color; } });
   }
 
-  function setTool(tool) { if (!tools[tool]) return; state.tool = tool; state.board.dataset.tool = tool; state.selectedId = null; renderOverlay(); }
-  function setColor(color) { state.color = color || '#c0392b'; if (state.tool === 'eraser') setTool('pen'); }
+  function setTool(tool) { if (!tools[tool]) return; state.tool = tool; state.board.dataset.tool = tool; state.selectedId = null; hideBrushCursor(); renderOverlay(); }
+  function setColor(color) { state.color = color || '#c0392b'; if (state.tool === 'eraser') setTool('pen'); if (state.brushCursor) state.brushCursor.style.backgroundColor = state.color; }
   function clear() { if (!state.project.objects.length && !state.project.background.imageUrl) return; state.project.objects = []; state.project.background = { type:'color', value:'#fff', imageUrl:null, fileName:null }; state.backgroundImage = null; commit(); }
   function transformSelected(action) {
     var object = state.project.objects.find(function (item) { return item.id === state.selectedId; }); if (!object) return;
@@ -452,7 +472,7 @@
     init:init, tools:tools, undo:undo, redo:redo, clear:clear, download:download,
     exportDataURL:exportDataURL, loadFlattenedImage:loadFlattenedImage, importBackground:importBackground,
     setTool:setTool, setColor:setColor,
-    setWidth:function (value) { state.width = Math.max(1, Number(value) || 1); },
+    setWidth:function (value) { state.width = Math.max(1, Number(value) || 1); if (state.brushCursor) { state.brushCursor.style.width = state.width + 'px'; state.brushCursor.style.height = state.width + 'px'; } },
     setOpacity:function (value) { state.opacity = Math.max(.1, Math.min(1, Number(value) || 1)); },
     setFill:function (value) { state.fill = Boolean(value); }, setFillColor:function (value) { state.fillColor = value; },
     setDashed:function (value) { state.dashed = Boolean(value); }, transformSelected:transformSelected,

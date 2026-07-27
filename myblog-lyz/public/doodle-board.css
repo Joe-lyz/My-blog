@@ -12,9 +12,13 @@
 #backgroundCanvas { z-index:1; pointer-events:none; }
 #drawingCanvas { z-index:2; pointer-events:none; }
 #overlayCanvas { z-index:3; cursor:crosshair; touch-action:none; }
+.doodle-brush-cursor { position:absolute; z-index:4; display:none; box-sizing:border-box; border:1px solid rgba(26,16,8,.8); border-radius:50%; pointer-events:none; transform:translate(-50%,-50%); }
+.drawing-board[data-tool="pen"] #overlayCanvas,
+.drawing-board[data-tool="eraser"] #overlayCanvas { cursor:none; }
+.drawing-board[data-tool="eraser"] .doodle-brush-cursor { background:rgba(255,255,255,.45); box-shadow:0 0 0 1px rgba(255,255,255,.8); }
 .drawing-board[data-tool="select"] #overlayCanvas { cursor:default; }
-.drawing-board[data-tool="eraser"] #overlayCanvas { cursor:cell; }
 .doodle-save-status { color:var(--muted); font-size:.75rem; min-width:5em; }
+.doodle-card-actions button.danger { color:#b42318; border-color:rgba(180,35,24,.35); }
 @media (max-width:700px) {
   .doodle-viewport { min-height:420px; place-items:start; }
   .drawing-board { transform-origin:top left; }
