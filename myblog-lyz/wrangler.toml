@@ -6,11 +6,6 @@ compatibility_date = "2026-01-01"
 directory = "public"
 binding = "ASSETS"
 
-[[r2_buckets]]
-binding = "TRAVEL_MEDIA"
-bucket_name = "my-blog-travel-media"
-preview_bucket_name = "my-blog-travel-media-preview"
-
 # To load the one-time sample trip in local development, run:
 #   wrangler dev --var ENVIRONMENT:development
 
@@ -20,3 +15,6 @@ preview_bucket_name = "my-blog-travel-media-preview"
 # binding = "BLOG_DB"
 # database_name = "my-blog-db"
 # database_id = "REPLACE_WITH_REAL_DATABASE_ID"
+
+# R2 is optional. Without it, travel records and compressed photos (max 1 MB)
+# use BLOG_DB. Only add a TRAVEL_MEDIA R2 binding if you upgrade later.

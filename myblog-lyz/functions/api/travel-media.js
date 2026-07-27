@@ -1,4 +1,4 @@
-import { deleteKVKey, getStore, internalError, json, methodNotAllowed, readKVJson, writeKVJson } from "../_lib/store.js";
+import { deleteKVKey, detectStoreMode, getStore, internalError, json, methodNotAllowed, readKVJson, writeKVJson } from "../_lib/store.js";
 
 const META_PREFIX = "travel:media:item:";
 const TRIP_INDEX_PREFIX = "travel:media:index:";
@@ -70,7 +70,7 @@ export async function onRequest({ request, env, params }) {
       const raw = await file.arrayBuffer();
       const metadata = {
         key: storageKey, tripId, stopId, name: safePart(file.name, `photo.${extension}`),
-        type: file.type, size: file.size, createdAt: new Date().toISOString(), storage: env?.TRAVEL_MEDIA ? "r2" : "development-fallback",
+        type: file.type, size: file.size, createdAt: new Date().toISOString(), storage: env?.TRAVEL_MEDIA ? "r2" : detectStoreMode(env),
       };
       if (env?.TRAVEL_MEDIA) {
         await env.TRAVEL_MEDIA.put(storageKey, raw, { httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" }, customMetadata: { tripId, stopId } });
@@ -78,7 +78,7 @@ export async function onRequest({ request, env, params }) {
         await (await getStore(env)).put("travel:media:blob:" + storageKey, JSON.stringify({ base64: bytesToBase64(raw), type: file.type }));
       }
       await rememberMedia(env, metadata);
-      return json({ ...metadata, url: `/api/travel-media/${storageKey}`, fallback: !env?.TRAVEL_MEDIA }, 201);
+      return json({ ...metadata, url: `/api/travel-media/${storageKey}` }, 201);
     }
 
     if (request.method === "GET") {

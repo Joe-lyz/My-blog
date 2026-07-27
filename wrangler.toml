@@ -5,3 +5,11 @@ compatibility_date = "2026-01-01"
 [assets]
 directory = "myblog-lyz/public"
 binding = "ASSETS"
+
+# Free-plan persistence: create one D1 database and bind it as BLOG_DB in the
+# Cloudflare Dashboard. For CLI-managed bindings, uncomment these lines and
+# replace the database id. R2 is not required.
+# [[d1_databases]]
+# binding = "BLOG_DB"
+# database_name = "myblog_database"
+# database_id = "REPLACE_WITH_REAL_DATABASE_ID"

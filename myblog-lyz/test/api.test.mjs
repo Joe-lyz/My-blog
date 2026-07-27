@@ -341,7 +341,7 @@ test("travel media rejects unsupported types and fallback upload can be deleted"
   const env=makeEnv(); let form=new FormData(); form.append("tripId","trip-test"); form.append("stopId","stop-test"); form.append("file",new File(["bad"],"bad.txt",{type:"text/plain"}));
   let response=await worker.fetch(new Request("https://example.com/api/travel-media",{method:"POST",body:form}),env,{}); assert.equal(response.status,415);
   form=new FormData(); form.append("tripId","trip-test"); form.append("stopId","stop-test"); form.append("file",new File([new Uint8Array([1,2,3])],"photo.webp",{type:"image/webp"}));
-  response=await worker.fetch(new Request("https://example.com/api/travel-media",{method:"POST",body:form}),env,{}); assert.equal(response.status,201); const media=await response.json(); assert.equal(media.fallback,true);
+  response=await worker.fetch(new Request("https://example.com/api/travel-media",{method:"POST",body:form}),env,{}); assert.equal(response.status,201); const media=await response.json(); assert.equal(media.storage,"kv");
   const get=await worker.fetch(new Request(`https://example.com${media.url}`),env,{}); assert.equal(get.status,200); assert.equal((await get.arrayBuffer()).byteLength,3);
   const del=await worker.fetch(new Request(`https://example.com${media.url}`,{method:"DELETE"}),env,{}); assert.equal(del.status,200);
   assert.equal((await worker.fetch(new Request(`https://example.com${media.url}`),env,{})).status,404);
@@ -371,10 +371,38 @@ test("travel navigation and map expose the requested editing controls", async ()
   assert.doesNotMatch(script, /maxBounds:/);
   assert.match(script, /fitBounds\(CHINA_BOUNDS/);
   assert.match(script, /Array\.from\(\{length:7\}.*2025\+index/);
-  assert.match(script, /'person-a':\{name:'小宁',url:'\/jn\.png'/);
-  assert.match(script, /'person-b':\{name:'小舟',url:'\/yz\.png'/);
+  assert.match(script, /'person-a':\{name:'小宁',url:'\/assets\/avatars\/jn\.svg'/);
+  assert.match(script, /'person-b':\{name:'小舟',url:'\/assets\/avatars\/yz\.svg'/);
   assert.match(script, /together\?avatarHtml\(trip,'person-a'\)\+avatarHtml\(trip,'person-b'\)/);
   assert.match(script, /mousedown.*beginRouteStroke/);
   assert.match(script, /mousemove.*continueRouteStroke/);
   assert.match(script, /mouseup.*finishRouteStroke/);
+});
+
+test("travel avatar files are included in the deployable public directory", async () => {
+  const [personA, personB] = await Promise.all([
+    readFile(new URL("../public/assets/avatars/jn.svg", import.meta.url), "utf8"),
+    readFile(new URL("../public/assets/avatars/yz.svg", import.meta.url), "utf8"),
+  ]);
+  assert.match(personA, /^<svg[\s\S]*data:image\/png;base64,/);
+  assert.match(personB, /^<svg[\s\S]*data:image\/png;base64,/);
+});
+
+test("travel media persists in D1 when R2 is unavailable", async () => {
+  const db = new MockD1();
+  const env = makeEnv({ BLOG_DB: db, BLOG_DATA: undefined });
+  const form = new FormData();
+  form.append("tripId", "d1-trip");
+  form.append("stopId", "d1-stop");
+  form.append("file", new File([new Uint8Array([4, 5, 6])], "d1-photo.png", { type: "image/png" }));
+
+  const upload = await worker.fetch(new Request("https://example.com/api/travel-media", { method: "POST", body: form }), env, {});
+  assert.equal(upload.status, 201);
+  const media = await upload.json();
+  assert.equal(media.storage, "d1");
+
+  const envAfterReload = makeEnv({ BLOG_DB: db, BLOG_DATA: undefined });
+  const download = await worker.fetch(new Request(`https://example.com${media.url}`), envAfterReload, {});
+  assert.equal(download.status, 200);
+  assert.deepEqual([...new Uint8Array(await download.arrayBuffer())], [4, 5, 6]);
 });

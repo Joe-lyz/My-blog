@@ -31,9 +31,24 @@ npx wrangler login
 3. Binding 名称填写：`BLOG_DB`（必须是这个名字）。
 4. Database 选择你创建的：`myblog_database`。
 
-完成后，日记/图片会写入 D1（会自动创建 `blog_kv` 表），刷新页面后仍可读取。
+完成后，日记、旅行路线、地点信息以及压缩后的旅行照片都会写入 D1（会自动创建
+`blog_kv` 表），刷新页面后仍可读取。
 
 > 兼容逻辑：优先使用 `BLOG_DB`（D1）；其次 `BLOG_DATA`（KV）；都没有时使用内存（不持久）。
+
+### 免费计划下的旅行地图存储（无需 R2）
+
+旅行模块现在只需要上面的一个 `BLOG_DB` D1 绑定，不再要求创建两个 R2 存储桶：
+
+- 旅行、地点、线路和照片元数据以 JSON 保存到 D1。
+- 浏览器会先压缩旅行照片；未绑定 R2 时，单张照片上限为 1 MB，并以 Base64 保存到 D1。
+- 没有绑定 D1/KV 时只会使用 Worker 内存，重启或重新部署后数据会丢失；可访问
+  `/api/health`，确认 `storeMode` 为 `d1`、`bindings.BLOG_DB` 为 `true`。
+- 以后若开通 R2，只需增加名为 `TRAVEL_MEDIA` 的 R2 binding；代码会自动把新上传的
+  照片放入 R2，D1 仍保存旅行信息和照片索引。
+
+头像源文件原先位于不会被部署的 `profile picture/`。可部署副本现在位于
+`public/assets/avatars/`，旅行地图使用对应的 `/assets/avatars/*.svg` 地址。
 
 ## 关键：Cloudflare Pages 构建设置（修复 build 报错）
 
