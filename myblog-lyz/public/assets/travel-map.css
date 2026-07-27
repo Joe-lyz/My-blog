@@ -1,0 +1,64 @@
+#travel-view { max-width: 1320px; }
+.travel-shell { border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 94%, white); box-shadow: 0 8px 24px rgba(50,35,20,.06); }
+.travel-header { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; padding:1.25rem 1.4rem; border-bottom:1px solid var(--line); }
+.travel-kicker { color:var(--accent); font-size:.72rem; letter-spacing:.18em; }
+.travel-header h1 { font-family:'Songti SC','STSong','Noto Serif CJK SC',serif; font-size:1.8rem; margin:.2rem 0; }
+.travel-description,.travel-status { color:var(--muted); font-size:.82rem; }
+.travel-tools,.travel-filters,.travel-edit-actions { display:flex; align-items:center; flex-wrap:wrap; gap:.55rem; }
+.travel-tools select,.travel-input,.travel-tools button,.travel-btn { border:1px solid var(--line); border-radius:2px; background:var(--paper); color:var(--ink); padding:.52rem .7rem; font:inherit; font-size:.82rem; }
+.travel-tools button,.travel-btn { cursor:pointer; }
+.travel-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+.travel-btn.danger { color:var(--accent); }
+.travel-admin-only[hidden] { display:none !important; }
+.travel-layout { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(310px,.85fr); min-height:620px; }
+.travel-map-column { position:relative; border-right:1px solid var(--line); }
+#travel-map { height:620px; min-height:420px; background:#eee8dc; }
+.travel-map-error,.travel-empty { display:grid; place-items:center; min-height:240px; padding:2rem; text-align:center; color:var(--muted); }
+.travel-map-controls { position:absolute; z-index:500; top:12px; right:12px; display:flex; flex-direction:column; box-shadow:0 2px 8px #38281926; }
+.travel-map-controls button { width:36px;height:36px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:1rem; }
+.travel-side { max-height:620px; overflow:auto; padding:1rem; scrollbar-color:var(--muted) transparent; }
+.travel-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
+.travel-stat { border:1px solid var(--line); padding:.65rem; text-align:center; font-size:.72rem; color:var(--muted); }
+.travel-stat strong { display:block; color:var(--ink); font-family:Georgia,serif; font-size:1.2rem; }
+.travel-timeline { list-style:none; border-left:1px solid var(--line); margin-left:.45rem; }
+.travel-event { position:relative; margin:0 0 .55rem 1rem; padding:.75rem; border:1px solid transparent; cursor:pointer; }
+.travel-event::before { content:''; position:absolute; left:-1.28rem; top:1rem; width:8px; height:8px; border-radius:50%; background:var(--paper); border:2px solid var(--accent); }
+.travel-event:hover,.travel-event.active { background:var(--hover-bg); border-color:var(--line); }
+.travel-event time { color:var(--accent); font-size:.72rem; }
+.travel-event p { margin-top:.25rem; font-size:.86rem; line-height:1.55; }
+.travel-card { margin-top:1rem; padding:1rem; border:1px solid var(--line); background:#fffaf2; }
+.travel-card h2 { font-family:'Songti SC','STSong',serif; font-size:1.2rem; }
+.travel-card-meta { color:var(--muted); font-size:.75rem; margin:.35rem 0 .8rem; }
+.travel-memory { border-left:2px solid var(--accent); padding-left:.7rem; color:var(--muted); font-style:italic; margin:.7rem 0; }
+.travel-gallery { display:grid; grid-template-columns:repeat(2,1fr); gap:.5rem; margin-top:.8rem; }
+.travel-gallery button { border:0;background:none;cursor:zoom-in;padding:0; }
+.travel-gallery img { display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border:1px solid var(--line); }
+.travel-marker { width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:grid;place-items:center;color:white;border:2px solid white;box-shadow:0 2px 6px #0005; }
+.travel-marker span { transform:rotate(45deg);font-size:14px; }
+.travel-marker.meetup { width:36px;height:36px;background:var(--accent)!important; }
+.travel-marker:focus { outline:3px solid var(--accent); outline-offset:2px; }
+.travel-dialog { border:1px solid var(--ink); background:var(--paper); color:var(--ink); width:min(680px,calc(100vw - 2rem)); max-height:calc(100vh - 2rem); padding:0; margin:auto; }
+.travel-dialog::backdrop { background:#21170f99; }
+.travel-dialog form { padding:1.2rem; overflow:auto; max-height:calc(100vh - 2rem); }
+.travel-dialog h2 { font-family:'Songti SC','STSong',serif; margin-bottom:1rem; }
+.travel-form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; }
+.travel-field { display:flex;flex-direction:column;gap:.3rem;font-size:.78rem;color:var(--muted); }
+.travel-field.wide { grid-column:1/-1; }
+.travel-field textarea { min-height:90px;resize:vertical; }
+.travel-stop-editor { border-top:1px dashed var(--line); margin-top:1rem; padding-top:1rem; }
+.travel-stop-row { display:grid;grid-template-columns:1fr 1fr 130px auto;gap:.4rem;margin:.45rem 0;align-items:center; }
+.travel-stop-row button { padding:.45rem; }
+.travel-lightbox { border:0;background:transparent;max-width:96vw;max-height:96vh; }
+.travel-lightbox img { max-width:92vw;max-height:88vh;object-fit:contain; }
+.leaflet-container { font-family:inherit; }
+@media (max-width:800px) {
+  #travel-view { width:100%; }
+  .travel-header { align-items:flex-start;flex-direction:column; }
+  .travel-layout { grid-template-columns:1fr; }
+  .travel-map-column { border-right:0;border-bottom:1px solid var(--line); }
+  #travel-map { height:52vh;min-height:360px; }
+  .travel-side { max-height:none; }
+  .travel-form-grid { grid-template-columns:1fr; }
+  .travel-stop-row { grid-template-columns:1fr 1fr; }
+}
+@media (prefers-reduced-motion:reduce) { .travel-shell * { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }

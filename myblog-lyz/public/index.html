@@ -1881,6 +1881,8 @@
   </style>
   <link rel="stylesheet" href="/love-app.css">
   <link rel="stylesheet" href="/doodle-board.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/assets/travel-map.css">
 </head>
 <body>
 
@@ -1924,6 +1926,7 @@
       <button data-view="reader" onclick="showView('reader', this)">阅读</button>
       <button data-view="about" onclick="showView('about', this)">关于我</button>
       <button data-view="love" onclick="showView('love', this)">恋爱纪念站</button>
+      <button data-view="travel" onclick="showView('travel', this)">旅行地图</button>
     </nav>
   </div>
 </header>
@@ -2360,6 +2363,28 @@
   <!-- 恋爱纪念站 -->
   <div id="love-view" class="view">
     <div id="love-react-root" style="padding:24px;color:#c8cfdd;">正在加载恋爱纪念站...</div>
+  </div>
+
+  <!-- 中国旅行地图（逻辑与样式位于独立静态资源中） -->
+  <div id="travel-view" class="view">
+    <section class="travel-shell" aria-labelledby="travel-title">
+      <header class="travel-header">
+        <div><div class="travel-kicker">TRAVEL NOTEBOOK · 中国</div><h1 id="travel-title">中国旅行地图</h1><p class="travel-description" id="travel-description">把相遇与沿途的风景，慢慢钉在地图上。</p></div>
+        <div class="travel-tools">
+          <label>旅行 <select id="travel-trip-filter" aria-label="选择旅行"></select></label>
+          <label>年份 <select id="travel-year-filter" aria-label="筛选年份"><option value="">全部年份</option></select></label>
+          <label>月份 <select id="travel-month-filter" aria-label="筛选月份"><option value="">全年</option></select></label>
+          <button id="travel-edit-mode" aria-label="切换旅行编辑模式">编辑模式</button>
+          <button class="travel-btn primary travel-admin-only" id="travel-add-trip" hidden>添加旅行</button>
+        </div>
+      </header>
+      <div class="travel-layout">
+        <div class="travel-map-column"><div id="travel-map" role="application" aria-label="中国旅行路线地图"></div><div class="travel-map-controls" aria-label="地图控制"><button id="travel-zoom-in" aria-label="放大地图">＋</button><button id="travel-zoom-out" aria-label="缩小地图">−</button><button id="travel-reset" aria-label="复位中国地图">⌂</button></div></div>
+        <aside class="travel-side" aria-label="旅行时间线与地点记录"><div id="travel-stats" class="travel-stats"></div><div id="travel-timeline"></div><article id="travel-stop-card"></article></aside>
+      </div>
+    </section>
+    <dialog id="travel-editor" class="travel-dialog"></dialog>
+    <dialog id="travel-lightbox" class="travel-lightbox"><button class="travel-btn" aria-label="关闭大图">关闭</button><img alt="旅行照片大图"></dialog>
   </div>
 
 </main>
@@ -3584,6 +3609,7 @@
     if (name === 'doodle') { initDoodleBoard(); renderDoodleGallery(); }
     if (name === 'reader') { renderBookshelf(); }
     if (name === 'love' && typeof window.initLoveMemorial === 'function') { window.initLoveMemorial(); }
+    if (name === 'travel' && typeof window.initTravelMap === 'function') { window.initTravelMap(); }
     if (name === 'write' && !editingPostId) {
       document.getElementById('write-label').textContent = '写一篇新文章';
       document.getElementById('submit-btn').innerHTML = '发布文章 &#8594;';
@@ -6091,5 +6117,7 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
 <script src="/love-app.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="/assets/travel-map.js"></script>
 </body>
 </html>
