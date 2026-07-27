@@ -359,7 +359,7 @@ test("drawing board keeps background, drawing, and preview on separate layers", 
   assert.match(script, /previewDataUrl/);
 });
 
-test("travel navigation and map expose the requested China-only editing controls", async () => {
+test("travel navigation and map expose the requested editing controls", async () => {
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
   const script = await readFile(new URL("../public/assets/travel-map.js", import.meta.url), "utf8");
   const css = await readFile(new URL("../public/assets/travel-map.css", import.meta.url), "utf8");
@@ -367,8 +367,13 @@ test("travel navigation and map expose the requested China-only editing controls
   assert.ok(html.indexOf('data-view="travel"') < html.indexOf('data-view="list"'));
   assert.match(html, /id="travel-draw-route"/);
   assert.match(css, /nav button\[data-view="travel"\][^{]*\{[^}]*box-shadow:/s);
-  assert.doesNotMatch(script, /tileLayer\(/);
-  assert.match(script, /Array\.from\(\{length:6\}.*2026\+index/);
+  assert.match(script, /tileLayer\(/);
+  assert.doesNotMatch(script, /maxBounds:/);
+  assert.match(script, /fitBounds\(CHINA_BOUNDS/);
+  assert.match(script, /Array\.from\(\{length:7\}.*2025\+index/);
+  assert.match(script, /'person-a':\{name:'小宁',url:'\/jn\.png'/);
+  assert.match(script, /'person-b':\{name:'小舟',url:'\/yz\.png'/);
+  assert.match(script, /together\?avatarHtml\(trip,'person-a'\)\+avatarHtml\(trip,'person-b'\)/);
   assert.match(script, /mousedown.*beginRouteStroke/);
   assert.match(script, /mousemove.*continueRouteStroke/);
   assert.match(script, /mouseup.*finishRouteStroke/);
