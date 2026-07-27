@@ -373,7 +373,11 @@ test("travel navigation and map expose the requested editing controls", async ()
   assert.match(script, /Array\.from\(\{length:7\}.*2025\+index/);
   assert.match(script, /'person-a':\{name:'小宁',url:'\/assets\/avatars\/jn\.svg'/);
   assert.match(script, /'person-b':\{name:'小舟',url:'\/assets\/avatars\/yz\.svg'/);
-  assert.match(script, /together\?avatarHtml\(trip,'person-a'\)\+avatarHtml\(trip,'person-b'\)/);
+  assert.match(script, /ids\.map\(function\(id\)\{return avatarHtml\(trip,id\);\}\)/);
+  assert.doesNotMatch(script, /travel-avatar-fallback/);
+  assert.match(script, /zoomAnimation:false,markerZoomAnimation:false/);
+  assert.match(script, /canvas\.toBlob\(function\(blob\).*'image\/jpeg',\.78/s);
+  assert.match(css, /\.travel-avatar-icon \{ background:transparent;border:0; \}/);
   assert.match(script, /mousedown.*beginRouteStroke/);
   assert.match(script, /mousemove.*continueRouteStroke/);
   assert.match(script, /mouseup.*finishRouteStroke/);
@@ -384,8 +388,8 @@ test("travel avatar files are included in the deployable public directory", asyn
     readFile(new URL("../public/assets/avatars/jn.svg", import.meta.url), "utf8"),
     readFile(new URL("../public/assets/avatars/yz.svg", import.meta.url), "utf8"),
   ]);
-  assert.match(personA, /^<svg[\s\S]*data:image\/png;base64,/);
-  assert.match(personB, /^<svg[\s\S]*data:image\/png;base64,/);
+  assert.match(personA, /^<svg[\s\S]*<path/);
+  assert.match(personB, /^<svg[\s\S]*<path/);
 });
 
 test("travel media persists in D1 when R2 is unavailable", async () => {

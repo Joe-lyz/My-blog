@@ -42,13 +42,11 @@ nav button[data-view="travel"]:hover,nav button[data-view="travel"].active { bac
 .travel-marker span { transform:rotate(45deg);font-size:14px; }
 .travel-marker.meetup { width:36px;height:36px;background:var(--accent)!important; }
 .travel-marker:focus { outline:3px solid var(--accent); outline-offset:2px; }
-.travel-avatar-marker { width:38px;height:38px;border-radius:50%;transform:none;background:var(--paper);display:flex;align-items:center;justify-content:center;overflow:visible;padding:2px;gap:0;border:2px solid white; }
-.travel-avatar-marker.together { width:62px;border-radius:22px;padding:2px 3px; }
-.travel-avatar-marker.meetup { width:62px;height:42px;background:#fff5ef!important;border-color:var(--accent); }
+.travel-avatar-icon { background:transparent;border:0; }
+.travel-avatar-marker { width:32px;height:32px;display:flex;align-items:center;justify-content:center; }
+.travel-avatar-marker.together { width:58px; }
 .travel-avatar-image { display:block;width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--paper);border:1px solid var(--line); }
-.travel-avatar-marker.together .travel-avatar-image { margin:0 -1px; }
-.travel-avatar-fallback { display:none;width:32px;height:32px;border-radius:50%;place-items:center;background:#e8f4ff;color:#1769aa;font-family:'Songti SC','STSong',serif;font-size:.8rem;font-weight:700; }
-.travel-avatar-fallback:not([hidden]) { display:grid; }
+.travel-avatar-marker.together .travel-avatar-image + .travel-avatar-image { margin-left:-6px; }
 .travel-dialog { border:1px solid var(--ink); background:var(--paper); color:var(--ink); width:min(680px,calc(100vw - 2rem)); max-height:calc(100vh - 2rem); padding:0; margin:auto; }
 .travel-dialog::backdrop { background:#21170f99; }
 .travel-dialog form { padding:1.2rem; overflow:auto; max-height:calc(100vh - 2rem); }
