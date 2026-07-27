@@ -366,6 +366,9 @@ test("travel navigation and map expose the requested editing controls", async ()
 
   assert.ok(html.indexOf('data-view="travel"') < html.indexOf('data-view="list"'));
   assert.match(html, /id="travel-draw-route"/);
+  assert.match(html, /id="travel-export"/);
+  assert.match(html, /id="travel-import-input"/);
+  assert.match(html, /id="travel-delete-trip"/);
   assert.match(css, /nav button\[data-view="travel"\][^{]*\{[^}]*box-shadow:/s);
   assert.match(script, /tileLayer\(/);
   assert.doesNotMatch(script, /maxBounds:/);
@@ -381,6 +384,10 @@ test("travel navigation and map expose the requested editing controls", async ()
   assert.match(script, /mousedown.*beginRouteStroke/);
   assert.match(script, /mousemove.*continueRouteStroke/);
   assert.match(script, /mouseup.*finishRouteStroke/);
+  assert.match(script, /data-field="content"/);
+  assert.match(script, /function exportTrips\(\)/);
+  assert.match(script, /function importTrips\(file\)/);
+  assert.match(script, /＋ 新建路线/);
 });
 
 test("travel avatar files are included in the deployable public directory", async () => {

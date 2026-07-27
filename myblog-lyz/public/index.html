@@ -2377,6 +2377,9 @@
           <button id="travel-edit-mode" aria-label="切换旅行编辑模式">编辑模式</button>
           <button class="travel-btn primary travel-admin-only" id="travel-add-trip" hidden>添加旅行</button>
           <button class="travel-btn travel-admin-only" id="travel-draw-route" aria-label="用鼠标绘制曲线路线" hidden>绘制线路</button>
+          <button class="travel-btn travel-admin-only" id="travel-export" hidden>导出路线</button>
+          <button class="travel-btn travel-admin-only" id="travel-import" hidden>导入路线</button>
+          <button class="travel-btn danger travel-admin-only" id="travel-delete-trip" hidden>删除旅行</button>
         </div>
       </header>
       <div class="travel-layout">
@@ -2386,6 +2389,7 @@
     </section>
     <dialog id="travel-editor" class="travel-dialog"></dialog>
     <dialog id="travel-lightbox" class="travel-lightbox"><button class="travel-btn" aria-label="关闭大图">关闭</button><img alt="旅行照片大图"></dialog>
+    <input type="file" id="travel-import-input" accept="application/json,.json" hidden>
   </div>
 
 </main>

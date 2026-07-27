@@ -57,6 +57,8 @@ nav button[data-view="travel"]:hover,nav button[data-view="travel"].active { bac
 .travel-field textarea { min-height:90px;resize:vertical; }
 .travel-stop-editor { border-top:1px dashed var(--line); margin-top:1rem; padding-top:1rem; }
 .travel-stop-row { display:grid;grid-template-columns:1fr 1fr 130px auto;gap:.4rem;margin:.45rem 0;align-items:center; }
+.travel-stop-notes { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
+.travel-stop-notes textarea { min-height:76px; resize:vertical; }
 .travel-stop-row button { padding:.45rem; }
 .travel-lightbox { border:0;background:transparent;max-width:96vw;max-height:96vh; }
 .travel-lightbox img { max-width:92vw;max-height:88vh;object-fit:contain; }
@@ -70,5 +72,6 @@ nav button[data-view="travel"]:hover,nav button[data-view="travel"].active { bac
   .travel-side { max-height:none; }
   .travel-form-grid { grid-template-columns:1fr; }
   .travel-stop-row { grid-template-columns:1fr 1fr; }
+  .travel-stop-notes { grid-template-columns:1fr; }
 }
 @media (prefers-reduced-motion:reduce) { .travel-shell * { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
