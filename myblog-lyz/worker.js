@@ -10,6 +10,8 @@ import { onRequest as booksHandler } from "./functions/api/books.js";
 import { onRequest as trashHandler } from "./functions/api/trash.js";
 import { onRequest as loveRecordsHandler } from "./functions/api/love-records.js";
 import { onRequest as loveMediaHandler } from "./functions/api/love-media.js";
+import { onRequest as travelHandler } from "./functions/api/travel.js";
+import { onRequest as travelMediaHandler } from "./functions/api/travel-media.js";
 
 const BUILD_VERSION = "2026-03-02-b386d2a-hotfix";
 
@@ -24,6 +26,7 @@ const routes = {
   "/api/books": booksHandler,
   "/api/trash": trashHandler,
   "/api/love-records": loveRecordsHandler,
+  "/api/travel": travelHandler,
   "/api/version": async () => json({ version: BUILD_VERSION }),
   "/api/health": async ({ env }) => {
     const storeMode = detectStoreMode(env);
@@ -48,6 +51,10 @@ export default {
 
     if (url.pathname.startsWith("/api/love-media")) {
       return loveMediaHandler({ request, env, ctx, params: { key: url.pathname.replace(/^\/api\/love-media\/?/, "") } });
+    }
+
+    if (url.pathname.startsWith("/api/travel-media")) {
+      return travelMediaHandler({ request, env, ctx, params: { key: url.pathname.replace(/^\/api\/travel-media\/?/, "") } });
     }
 
     if (handler) {

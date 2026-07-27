@@ -300,6 +300,53 @@ test("non-api requests are served by ASSETS", async () => {
   assert.equal(await res.text(), "asset");
 });
 
+function travelFixture() {
+  const stops = [
+    { id:"harbin", name:"哈尔滨", longitude:126.63, latitude:45.75, arrivedAt:"2026-07-01T08:00:00+08:00", departedAt:"2026-07-01T09:00:00+08:00", stopType:"start", participants:["person-a"], order:0 },
+    { id:"shanghai", name:"上海", longitude:121.47, latitude:31.23, arrivedAt:"2026-07-01T08:00:00+08:00", departedAt:"2026-07-01T09:00:00+08:00", stopType:"start", participants:["person-b"], order:1 },
+    { id:"beijing", name:"北京", longitude:116.4, latitude:39.9, arrivedAt:"2026-07-02T10:00:00+08:00", departedAt:"2026-07-03T08:00:00+08:00", stopType:"meetup", participants:["person-a","person-b"], order:2 },
+    { id:"xian", name:"西安", longitude:108.94, latitude:34.34, arrivedAt:"2026-07-03T14:00:00+08:00", departedAt:"2026-07-31T23:00:00+08:00", stopType:"transport-change", participants:["person-a","person-b"], order:3 },
+    { id:"chengdu", name:"成都", longitude:104.07, latitude:30.67, arrivedAt:"2026-08-01T18:00:00+08:00", departedAt:"2026-08-02T09:00:00+08:00", stopType:"destination", participants:["person-a","person-b"], order:4 },
+  ];
+  const segment = (id, from, to, travelerState, transportMode, startedAt, endedAt, order) => ({ id, fromStopId:from.id, toStopId:to.id, travelerState, transportMode, coordinates:[[from.longitude,from.latitude],[to.longitude,to.latitude]], startedAt, endedAt, order });
+  return { title:"夏日见面旅行", description:"分别出发，在北京相见。", startDate:"2026-07-01", endDate:"2026-08-02", travelers:[{id:"person-a",name:"人物A"},{id:"person-b",name:"人物B"}], stops, segments:[
+    segment("a-flight",stops[0],stops[2],"person-a","plane",stops[0].departedAt,stops[2].arrivedAt,0), segment("b-train",stops[1],stops[2],"person-b","train",stops[1].departedAt,stops[2].arrivedAt,1),
+    segment("together-train",stops[2],stops[3],"together","train",stops[2].departedAt,stops[3].arrivedAt,2), segment("together-car",stops[3],stops[4],"together","car",stops[3].departedAt,stops[4].arrivedAt,3),
+  ] };
+}
+
+test("travel API creates, lists, updates and deletes a two-person meetup trip", async () => {
+  const env=makeEnv(); const created=await call(env,"/api/travel","POST",travelFixture());
+  assert.equal(created.status,201); assert.ok(created.body.id);
+  assert.deepEqual(created.body.segments.slice(0,2).map((s)=>s.travelerState),["person-a","person-b"]);
+  assert.deepEqual(created.body.segments.slice(2).map((s)=>s.travelerState),["together","together"]);
+  assert.deepEqual(created.body.segments.slice(2).map((s)=>s.transportMode),["train","car"]);
+  assert.equal((await call(env,"/api/travel")).body.length,1);
+  created.body.title="更新后的旅行"; assert.equal((await call(env,"/api/travel","PUT",created.body)).body.title,"更新后的旅行");
+  assert.equal((await call(env,"/api/travel","DELETE",{id:created.body.id})).body.success,true); assert.equal((await call(env,"/api/travel")).body.length,0);
+});
+
+test("travel month filter includes segments intersecting the selected month", async () => {
+  const env=makeEnv(); const created=await call(env,"/api/travel","POST",travelFixture());
+  const july=await call(env,`/api/travel?id=${created.body.id}&month=2026-07`); assert.equal(july.body.stops.some((s)=>s.id==="chengdu"),false); assert.equal(july.body.segments.some((s)=>s.id==="together-car"),true);
+  const august=await call(env,`/api/travel?id=${created.body.id}&month=2026-08`); assert.equal(august.body.segments.some((s)=>s.id==="together-car"),true);
+});
+
+test("travel API rejects invalid dates and coordinates", async () => {
+  const env=makeEnv(),badDate=travelFixture(); badDate.startDate="not-a-date"; assert.equal((await call(env,"/api/travel","POST",badDate)).status,400);
+  const badPoint=travelFixture(); badPoint.stops[0].longitude=999; assert.equal((await call(env,"/api/travel","POST",badPoint)).status,400);
+});
+
+test("travel media rejects unsupported types and fallback upload can be deleted", async () => {
+  const env=makeEnv(); let form=new FormData(); form.append("tripId","trip-test"); form.append("stopId","stop-test"); form.append("file",new File(["bad"],"bad.txt",{type:"text/plain"}));
+  let response=await worker.fetch(new Request("https://example.com/api/travel-media",{method:"POST",body:form}),env,{}); assert.equal(response.status,415);
+  form=new FormData(); form.append("tripId","trip-test"); form.append("stopId","stop-test"); form.append("file",new File([new Uint8Array([1,2,3])],"photo.webp",{type:"image/webp"}));
+  response=await worker.fetch(new Request("https://example.com/api/travel-media",{method:"POST",body:form}),env,{}); assert.equal(response.status,201); const media=await response.json(); assert.equal(media.fallback,true);
+  const get=await worker.fetch(new Request(`https://example.com${media.url}`),env,{}); assert.equal(get.status,200); assert.equal((await get.arrayBuffer()).byteLength,3);
+  const del=await worker.fetch(new Request(`https://example.com${media.url}`,{method:"DELETE"}),env,{}); assert.equal(del.status,200);
+  assert.equal((await worker.fetch(new Request(`https://example.com${media.url}`),env,{})).status,404);
+});
+
 test("drawing board keeps background, drawing, and preview on separate layers", async () => {
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
   const script = await readFile(new URL("../public/doodle-board.js", import.meta.url), "utf8");
@@ -310,4 +357,24 @@ test("drawing board keeps background, drawing, and preview on separate layers", 
   assert.match(script, /destination-out/);
   assert.match(script, /indexedDB\.open/);
   assert.match(script, /previewDataUrl/);
+});
+
+test("travel navigation and map expose the requested editing controls", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const script = await readFile(new URL("../public/assets/travel-map.js", import.meta.url), "utf8");
+  const css = await readFile(new URL("../public/assets/travel-map.css", import.meta.url), "utf8");
+
+  assert.ok(html.indexOf('data-view="travel"') < html.indexOf('data-view="list"'));
+  assert.match(html, /id="travel-draw-route"/);
+  assert.match(css, /nav button\[data-view="travel"\][^{]*\{[^}]*box-shadow:/s);
+  assert.match(script, /tileLayer\(/);
+  assert.doesNotMatch(script, /maxBounds:/);
+  assert.match(script, /fitBounds\(CHINA_BOUNDS/);
+  assert.match(script, /Array\.from\(\{length:7\}.*2025\+index/);
+  assert.match(script, /'person-a':\{name:'小宁',url:'\/jn\.png'/);
+  assert.match(script, /'person-b':\{name:'小舟',url:'\/yz\.png'/);
+  assert.match(script, /together\?avatarHtml\(trip,'person-a'\)\+avatarHtml\(trip,'person-b'\)/);
+  assert.match(script, /mousedown.*beginRouteStroke/);
+  assert.match(script, /mousemove.*continueRouteStroke/);
+  assert.match(script, /mouseup.*finishRouteStroke/);
 });
