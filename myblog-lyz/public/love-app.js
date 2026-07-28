@@ -5,10 +5,8 @@
   const STORAGE_KEY = "love_memorial_v1";
   const EVENT_TAGS = ["见面", "聊天很多", "吵架", "和好", "礼物", "纪念日", "一起吃饭", "一起散步", "旅行", "平凡但幸福"];
 
-  const config = {
-    relationshipStart: chinaMs("2026-02-17 00:00:00"),
-    meetupTarget: chinaMs("2026-04-25 00:00:00"),
-  };
+  const RELATIONSHIP_START = "2026-02-17 00:00:00";
+  const DEFAULT_MEETUP_TARGET = "2026-04-25 00:00:00";
 
   function chinaMs(v) {
     const [d, t] = v.split(" ");
@@ -24,6 +22,16 @@
   function parseDayKey(key) {
     const [y, m, d] = key.split("-").map(Number);
     return Date.UTC(y, m - 1, d, -8, 0, 0);
+  }
+
+  function normalizeMeetupTarget(value) {
+    return typeof value === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?$/.test(value)
+      ? (value.length === 16 ? value + ":00" : value)
+      : DEFAULT_MEETUP_TARGET;
+  }
+
+  function datetimeInputValue(value) {
+    return normalizeMeetupTarget(value).replace(" ", "T").slice(0, 16);
   }
 
   function splitDuration(ms) {
@@ -59,6 +67,9 @@
     const [uploadState, setUploadState] = useState({ total: 0, loaded: 0, active: false, message: "" });
     const [filter, setFilter] = useState("all");
     const [view, setView] = useState("calendar");
+    const [meetupTarget, setMeetupTarget] = useState(DEFAULT_MEETUP_TARGET);
+    const [meetupSaved, setMeetupSaved] = useState(false);
+    const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
       const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -68,26 +79,34 @@
     useEffect(() => {
       const local = localStorage.getItem(STORAGE_KEY);
       if (local) {
-        try { setRecords(JSON.parse(local).dailyRecords || {}); } catch {}
+        try {
+          const saved = JSON.parse(local);
+          setRecords(saved.dailyRecords || {});
+          setMeetupTarget(normalizeMeetupTarget(saved.meetupTarget));
+        } catch {}
       }
       api("/api/love-records").then((d) => {
         if (d.dailyRecords) {
           setRecords(d.dailyRecords);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
         }
-      }).catch(() => {});
+        if (d.meetupTarget) setMeetupTarget(normalizeMeetupTarget(d.meetupTarget));
+      }).catch(() => {}).finally(() => setHydrated(true));
     }, []);
 
     useEffect(() => {
-      const payload = { relationshipStart: "2026-02-17 00:00:00", meetupTarget: "2026-04-25 00:00:00", dailyRecords: records, updatedAt: new Date().toISOString() };
+      if (!hydrated) return;
+      const payload = { relationshipStart: RELATIONSHIP_START, meetupTarget, dailyRecords: records, updatedAt: new Date().toISOString() };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       const id = setTimeout(() => { api("/api/love-records", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(() => {}); }, 420);
       return () => clearTimeout(id);
-    }, [records]);
+    }, [records, meetupTarget, hydrated]);
 
-    const cDown = splitDuration(config.meetupTarget - now);
-    const inLove = splitDuration(now - config.relationshipStart);
-    const miles = getMilestones(config.relationshipStart, now);
+    const meetupTargetMs = chinaMs(normalizeMeetupTarget(meetupTarget));
+    const relationshipStartMs = chinaMs(RELATIONSHIP_START);
+    const cDown = splitDuration(meetupTargetMs - now);
+    const inLove = splitDuration(now - relationshipStartMs);
+    const miles = getMilestones(relationshipStartMs, now);
 
     const dayList = useMemo(() => {
       const first = new Date(month.y, month.m, 1);
@@ -115,7 +134,8 @@
     const timeline = Object.entries(records).sort((a, b) => a[0] < b[0] ? 1 : -1)
       .filter(([_, r]) => filter === "all" || (filter === "filled" ? true : (r.tags || []).includes(filter)));
 
-    const isMeetupReached = now >= config.meetupTarget;
+    const isMeetupReached = now >= meetupTargetMs;
+    const meetupDay = meetupTarget.slice(0, 10);
 
     return html`
       <div className="love-app">
@@ -126,6 +146,16 @@
             <div className="meta">${isMeetupReached ? "今天见面啦" : "距离见面还有"}</div>
             <div className="love-counterRow">
               ${[ [cDown.d, "天"], [cDown.h, "时"], [cDown.m, "分"], [cDown.s, "秒"] ].map(([n,l]) => html`<div className="timeBlock"><div className="timeNum">${isMeetupReached ? 0 : n}</div><div className="timeLabel">${l}</div></div>`)}
+            </div>
+            <div className="meetup-setting">
+              <label htmlFor="meetup-target">下次见面时间</label>
+              <input id="meetup-target" className="field meetup-input" type="datetime-local" value=${datetimeInputValue(meetupTarget)} onChange=${(event) => {
+                if (!event.target.value) return;
+                setMeetupTarget(event.target.value.replace("T", " ") + ":00");
+                setMeetupSaved(true);
+                setTimeout(() => setMeetupSaved(false), 1800);
+              }} />
+              <span className="meetup-hint">${meetupSaved ? "已保存新的见面时间" : "修改后会自动保存，并同步更新倒计时"}</span>
             </div>
           </section>
 
@@ -154,7 +184,7 @@
                 ${dayList.map((key) => {
                   if (!key) return html`<div className="cell muted"></div>`;
                   const rec = records[key];
-                  const special = key === "2026-02-17" || key === "2026-04-25";
+                  const special = key === RELATIONSHIP_START.slice(0, 10) || key === meetupDay;
                   const isToday = key === dayKey(now);
                   return html`<button type="button" className=${"cell " + (special?"special":"") + (isToday?" today":"")} onClick=${() => setEditing({ key, ...(rec || { special:false, tags:[], mood:3, note:"", media: [] }) })}><span className="d">${Number(key.slice(-2))}</span>${rec ? html`<span className="dot"></span><span className="tag">${(rec.tags||[])[0] || "已记"}</span>`:""}</button>`;
                 })}
