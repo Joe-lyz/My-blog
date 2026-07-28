@@ -120,7 +120,14 @@
       announce('自动保存失败');
     }
   }
-  var scheduleSave = debounce(saveLocal, 500);
+  function saveWhenIdle() {
+    announce('等待自动保存…');
+    if (global.requestIdleCallback) global.requestIdleCallback(saveLocal, { timeout: 2000 });
+    else setTimeout(saveLocal, 0);
+  }
+  // Exporting the preview is relatively expensive. Wait until drawing has paused,
+  // then do it in an idle period so persistence never competes with the pen.
+  var scheduleSave = debounce(saveWhenIdle, 1200);
 
   function announce(text) {
     var el = document.getElementById('doodle-save-status');
@@ -298,8 +305,21 @@
 
   function pathTool(name) {
     return {
-      pointerDown: function (event, p) { var object = baseObject('path'); object.tool = name; object.points = [p]; state.activeObject = object; },
-      pointerMove: function (event, p) { if (!state.activeObject) return; state.activeObject.points.push(p); renderOverlay(state.activeObject); },
+      pointerDown: function (event, p) {
+        var object = baseObject('path'); object.tool = name; object.points = [p]; state.activeObject = object;
+        renderOverlay();
+      },
+      pointerMove: function (event, p) {
+        if (!state.activeObject) return;
+        var points = state.activeObject.points;
+        var previous = points[points.length - 1];
+        points.push(p);
+        // Paint only the new segment. Repainting the complete growing path on every
+        // pointer event becomes progressively slower during a long stroke.
+        var ctx = state.contexts.overlay;
+        ctx.save(); configure(ctx, state.activeObject); ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.restore();
+      },
       pointerUp: function (event, p) { if (!state.activeObject) return; state.activeObject.points.push(p); state.project.objects.push(state.activeObject); state.activeObject = null; commit(); }
     };
   }
@@ -335,7 +355,13 @@
     state.canvases.overlay.setPointerCapture(event.pointerId);
     tools[state.tool].pointerDown(event, point(event));
   }
-  function pointerMove(event) { if (event.pointerId === state.pointerId) { event.preventDefault(); tools[state.tool].pointerMove(event, point(event)); } }
+  function pointerMove(event) {
+    if (event.pointerId !== state.pointerId) return;
+    event.preventDefault();
+    var samples = typeof event.getCoalescedEvents === 'function' ? event.getCoalescedEvents() : [event];
+    if (!samples.length) samples = [event];
+    samples.forEach(function (sample) { tools[state.tool].pointerMove(sample, point(sample)); });
+  }
   function pointerUp(event) {
     if (event.pointerId !== state.pointerId) return;
     event.preventDefault(); tools[state.tool].pointerUp(event, point(event));
