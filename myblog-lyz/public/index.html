@@ -605,13 +605,16 @@
 
     /* ─── Audio Player Bar ─── */
     .audio-player-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: 68px; background: var(--ink); color: #fff;
-      display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem;
-      z-index: 999; box-shadow: 0 -2px 16px rgba(0,0,0,0.2);
+      position: fixed; left: 0; top: var(--audio-dock-top, 50%);
+      width: min(390px, calc(100vw - 54px)); min-height: 172px;
+      background: var(--ink); color: #fff;
+      display: flex; flex-wrap: wrap; align-items: center; padding: 1rem; gap: 0.8rem;
+      z-index: 999; box-shadow: 4px 8px 24px rgba(0,0,0,0.2);
+      border-radius: 0 18px 18px 0;
       transition: transform 0.3s ease;
+      transform: translateY(-50%);
     }
-    .audio-player-bar.hidden { transform: translateY(100%); }
+    .audio-player-bar.hidden { transform: translate(-100%, -50%); pointer-events: none; }
     .audio-play-btn {
       background: none; border: 2px solid rgba(255,255,255,0.6);
       color: #fff; width: 40px; height: 40px; border-radius: 50%;
@@ -646,7 +649,7 @@
       color: #fff; background: rgba(255,255,255,0.12);
     }
     .audio-url-panel {
-      position: fixed; bottom: 76px; left: 20px;
+      position: fixed; top: calc(var(--audio-dock-top, 50%) + 98px); left: 16px;
       background: #fff; border: 1px solid var(--line); border-radius: 8px;
       padding: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       z-index: 1000; width: 360px; display: none;
@@ -665,20 +668,25 @@
       cursor: pointer; font-family: 'Noto Sans SC', sans-serif;
     }
     .player-sidebar-toggle {
-      position: fixed; left: 0; bottom: 50%; transform: translateY(50%);
-      width: 32px; height: 72px; background: var(--ink); color: #fff;
-      border: none; border-radius: 0 8px 8px 0; cursor: pointer;
-      z-index: 998; font-size: 1rem; display: none;
-      align-items: center; justify-content: center;
+      position: fixed; left: 0; top: var(--audio-dock-top, 50%); transform: translateY(-50%);
+      width: 46px; min-height: 152px; padding: 10px 7px; background: var(--ink); color: #fff;
+      border: none; border-radius: 0 14px 14px 0; cursor: grab;
+      z-index: 998; display: flex; flex-direction: column; gap: 8px;
+      align-items: center; justify-content: center; touch-action: none;
       box-shadow: 2px 0 8px rgba(0,0,0,0.15); transition: all 0.2s;
     }
-    .player-sidebar-toggle:hover { width: 38px; }
-    .player-sidebar-toggle.show { display: flex; }
+    .player-sidebar-toggle.dragging { cursor: grabbing; transition: none; }
+    .player-sidebar-toggle.expanded { opacity: 0; pointer-events: none; }
+    .player-sidebar-toggle:hover { width: 50px; }
+    .player-sidebar-icon { border: 0; padding: 3px; background: none; color: #fff; font-size: 1.1rem; cursor: pointer; }
+    .sidebar-volume { width: 72px; accent-color: var(--accent); transform: rotate(-90deg); margin: 28px 0; cursor: pointer; }
+    .sidebar-volume-icon { font-size: 0.72rem; opacity: 0.8; }
 
     #audio-external-wrap {
       position: fixed;
-      left: 38px;
-      bottom: calc(50% - 86px);
+      left: min(400px, calc(100vw - 44px));
+      top: var(--audio-dock-top, 50%);
+      transform: translateY(-50%);
       width: min(250px, calc(100vw - 70px));
       z-index: 999;
       border-radius: 10px;
@@ -1463,7 +1471,7 @@
     /* Adjust main for wider list view */
     main { max-width: 1200px; }
     .view:not(#list-view) { max-width: 860px; margin: 0 auto; }
-    body.has-audio-player main { padding-bottom: 80px; }
+    body.has-audio-player main { padding-bottom: 0; }
 
     /* Warm visual refresh */
     :root {
@@ -1787,9 +1795,8 @@
       background: linear-gradient(135deg, var(--accent-strong), var(--accent));
     }
     .audio-player-bar {
-      height: 72px;
       background: rgba(52, 38, 28, 0.9);
-      box-shadow: 0 -10px 30px rgba(52, 38, 28, 0.18);
+      box-shadow: 8px 10px 30px rgba(52, 38, 28, 0.18);
       backdrop-filter: blur(16px);
     }
     .audio-play-btn {
@@ -2501,7 +2508,7 @@
 
 <!-- ─── Audio Player ─── -->
 <audio id="audio-element" preload="auto"></audio>
-<div class="audio-player-bar" id="audio-player-bar">
+<div class="audio-player-bar hidden" id="audio-player-bar">
   <button class="audio-play-btn" id="audio-play-btn" onclick="toggleAudioPlay()">&#9654;</button>
   <div class="audio-info">
     <div class="audio-track-name" id="audio-track-name">&#9835; 未加载音频</div>
@@ -2520,7 +2527,11 @@
 <div id="audio-external-wrap" style="display:none;">
   <iframe id="audio-external-frame" title="external-audio" allow="autoplay; fullscreen" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
-<button class="player-sidebar-toggle" id="player-sidebar-toggle" onclick="showAudioPlayer()">&#9835;</button>
+<div class="player-sidebar-toggle" id="player-sidebar-toggle" aria-label="可移动的音乐播放器隐藏栏">
+  <button class="player-sidebar-icon" type="button" onclick="showAudioPlayer()" aria-label="展开音乐播放器">&#9835;</button>
+  <input class="sidebar-volume" id="sidebar-audio-volume" type="range" min="0" max="1" step="0.05" value="0.7" oninput="setAudioVolume(this.value)" aria-label="音乐音量">
+  <span class="sidebar-volume-icon" aria-hidden="true">&#128266;</span>
+</div>
 <button class="fireworks-btn" id="fireworks-btn" onclick="launchTripleFireworks()">🎆 放烟花</button>
 <canvas id="fireworks-canvas"></canvas>
 
@@ -4128,7 +4139,11 @@
     return 'https://player.bilibili.com/player.html?bvid=' + m[1] + '&page=1&high_quality=1&autoplay=1&loop=1';
   }
 
+  var DEFAULT_AUDIO_URL = 'https://www.bilibili.com/video/BV1angj6FEaK/?spm_id_from=333.337.search-card.all.click&vd_source=18731e0e079ac0aebd18ecfd66b7d3e1';
   var externalVolume = 0.7;
+  var externalVolumeTimer = 0;
+  var currentAudioUrl = DEFAULT_AUDIO_URL;
+  var currentAudioMode = 'external';
 
   function normalizeExternalMediaUrl(url) {
     var bilibili = parseBilibiliEmbedUrl(url);
@@ -4162,12 +4177,10 @@
   function initAudioPlayer() {
     var savedConfig = null;
     try { savedConfig = JSON.parse(localStorage.getItem('audioPlayerConfig') || 'null'); } catch(e) {}
-    var savedUrl = localStorage.getItem('audioPlayerUrl') || (savedConfig && savedConfig.url) || '';
-    if (savedUrl) {
-      loadAudioUrl(savedUrl, savedConfig && savedConfig.mode);
-    }
+    var savedUrl = localStorage.getItem('audioPlayerUrl') || (savedConfig && savedConfig.url) || DEFAULT_AUDIO_URL;
+    var savedVolume = savedConfig && typeof savedConfig.volume === 'number' ? savedConfig.volume : 0.7;
     var audio = document.getElementById('audio-element');
-    audio.volume = 0.7;
+    setAudioVolume(savedVolume, false);
     audio.addEventListener('timeupdate', updateAudioProgress);
     audio.loop = true;
     audio.addEventListener('ended', function() {
@@ -4175,14 +4188,23 @@
         document.getElementById('audio-play-btn').innerHTML = '&#9654;';
       }
     });
-    document.body.classList.add('has-audio-player');
+    loadAudioUrl(savedUrl, savedConfig && savedConfig.mode, false);
+    if (isDirectAudioUrl(savedUrl)) {
+      audio.play().then(function() {
+        document.getElementById('audio-play-btn').innerHTML = '&#10074;&#10074;';
+      }).catch(function() {});
+    }
+    hideAudioPlayer();
+    initAudioDockDrag();
   }
 
-  function loadAudioUrl(url, forcedMode) {
+  function loadAudioUrl(url, forcedMode, shouldPersist) {
     var audio = document.getElementById('audio-element');
     var externalFrame = document.getElementById('audio-external-frame');
     var externalWrap = document.getElementById('audio-external-wrap');
     var mode = forcedMode || (isDirectAudioUrl(url) ? 'audio' : 'external');
+    currentAudioUrl = url;
+    currentAudioMode = mode;
 
     if (mode === 'audio') {
       audio.src = url;
@@ -4198,23 +4220,25 @@
       externalWrap.style.display = document.getElementById('audio-player-bar').classList.contains('hidden') ? 'none' : 'block';
       externalFrame.src = embed;
       setTimeout(function(){ applyExternalVolume(externalVolume, true); }, 500);
-      showAudioPlayer();
-      document.getElementById('audio-track-name').textContent = '外部音频源已加载';
+      document.getElementById('audio-track-name').textContent = url === DEFAULT_AUDIO_URL ? '默认音乐 · Bilibili' : '自定义外部音频源';
       document.getElementById('audio-time').textContent = '外部链接模式';
       document.getElementById('audio-progress-fill').style.width = '0%';
     }
 
-    localStorage.setItem('audioPlayerUrl', url);
-    localStorage.setItem('audioPlayerConfig', JSON.stringify({ url: url, mode: mode }));
+    if (shouldPersist !== false) {
+      localStorage.setItem('audioPlayerUrl', url);
+      saveAudioConfig(url, mode);
+    }
+  }
+
+  function saveAudioConfig(url, mode) {
+    localStorage.setItem('audioPlayerConfig', JSON.stringify({ url: url, mode: mode, volume: externalVolume }));
   }
 
   function toggleAudioPlay() {
     var audio = document.getElementById('audio-element');
-    var cfg = null;
-    try { cfg = JSON.parse(localStorage.getItem('audioPlayerConfig') || 'null'); } catch(e) {}
-    var mode = (cfg && cfg.mode) || 'audio';
 
-    if (mode === 'external') {
+    if (currentAudioMode === 'external') {
       var frame = document.getElementById('audio-external-frame');
       if (!frame.src) {
         toggleAudioUrlPanel();
@@ -4282,15 +4306,20 @@
     } catch (e) {}
   }
 
-  function setAudioVolume(val) {
+  function setAudioVolume(val, shouldPersist) {
     var volume = parseFloat(val);
+    if (!isFinite(volume)) volume = 0.7;
     externalVolume = volume;
     document.getElementById('audio-element').volume = volume;
+    document.getElementById('audio-volume').value = volume;
+    document.getElementById('sidebar-audio-volume').value = volume;
 
-    var cfg = null;
-    try { cfg = JSON.parse(localStorage.getItem('audioPlayerConfig') || 'null'); } catch(e) {}
-    if (cfg && cfg.mode === 'external') {
-      applyExternalVolume(volume, true);
+    if (currentAudioMode === 'external') {
+      window.clearTimeout(externalVolumeTimer);
+      externalVolumeTimer = window.setTimeout(function() { applyExternalVolume(volume, true); }, 250);
+    }
+    if (shouldPersist !== false) {
+      saveAudioConfig(currentAudioUrl, currentAudioMode);
     }
   }
 
@@ -4306,12 +4335,10 @@
   function applyAudioUrl() {
     var url = document.getElementById('audio-url-input').value.trim();
     if (!url) return;
-    loadAudioUrl(url);
+    loadAudioUrl(url, null, true);
     document.getElementById('audio-url-panel').classList.remove('show');
 
-    var cfg = null;
-    try { cfg = JSON.parse(localStorage.getItem('audioPlayerConfig') || 'null'); } catch(e) {}
-    if (cfg && cfg.mode === 'audio') {
+    if (currentAudioMode === 'audio') {
       var audio = document.getElementById('audio-element');
       audio.play().catch(function() {});
     }
@@ -4321,20 +4348,52 @@
   function hideAudioPlayer() {
     document.getElementById('audio-player-bar').classList.add('hidden');
     document.getElementById('audio-external-wrap').style.display = 'none';
-    document.getElementById('player-sidebar-toggle').classList.add('show');
+    document.getElementById('player-sidebar-toggle').classList.remove('expanded');
     document.getElementById('audio-url-panel').classList.remove('show');
     document.body.classList.remove('has-audio-player');
   }
 
   function showAudioPlayer() {
     document.getElementById('audio-player-bar').classList.remove('hidden');
-    document.getElementById('player-sidebar-toggle').classList.remove('show');
-    var cfg = null;
-    try { cfg = JSON.parse(localStorage.getItem('audioPlayerConfig') || 'null'); } catch(e) {}
-    if (cfg && cfg.mode === 'external') {
+    document.getElementById('player-sidebar-toggle').classList.add('expanded');
+    if (currentAudioMode === 'external') {
       document.getElementById('audio-external-wrap').style.display = 'block';
     }
     document.body.classList.add('has-audio-player');
+  }
+
+  function initAudioDockDrag() {
+    var dock = document.getElementById('player-sidebar-toggle');
+    if (!dock || dock.dataset.dragReady) return;
+    dock.dataset.dragReady = 'true';
+    var savedTop = parseFloat(localStorage.getItem('audioDockTop'));
+    if (isFinite(savedTop)) document.documentElement.style.setProperty('--audio-dock-top', savedTop + 'px');
+    var dragging = false;
+    var moved = false;
+
+    dock.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('input, button')) return;
+      dragging = true;
+      moved = false;
+      dock.classList.add('dragging');
+      dock.setPointerCapture(e.pointerId);
+    });
+    dock.addEventListener('pointermove', function(e) {
+      if (!dragging) return;
+      moved = true;
+      var half = dock.offsetHeight / 2;
+      var top = Math.max(half + 8, Math.min(window.innerHeight - half - 8, e.clientY));
+      document.documentElement.style.setProperty('--audio-dock-top', top + 'px');
+    });
+    dock.addEventListener('pointerup', function(e) {
+      if (!dragging) return;
+      dragging = false;
+      dock.classList.remove('dragging');
+      dock.releasePointerCapture(e.pointerId);
+      var top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--audio-dock-top'));
+      if (isFinite(top)) localStorage.setItem('audioDockTop', String(top));
+      if (!moved && !e.target.closest('input')) showAudioPlayer();
+    });
   }
 
   var backupSelection = {};
