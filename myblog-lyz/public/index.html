@@ -985,9 +985,21 @@
     .gift-board-title { font-family: 'Songti SC', 'STSong', serif; font-size: 1.15rem; font-weight: 700; }
     .gift-board-count { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.12em; }
     .gift-card { position: relative; z-index: 1; }
+    .gift-card[hidden] { display: none; }
     .gift-video { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; background: #211813; border-radius: 18px; box-shadow: 0 12px 28px rgba(83,52,35,0.18); }
     .gift-name { margin-top: 0.9rem; font-family: 'Songti SC', 'STSong', serif; font-size: 1rem; font-weight: 600; }
     .gift-from { margin-top: 0.25rem; color: var(--muted); font-size: 0.8rem; }
+    .gift-pagination { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-top: 0.9rem; }
+    .gift-page-btn {
+      width: 2rem; height: 2rem; border: 1px solid rgba(192,57,43,0.2); border-radius: 50%;
+      background: rgba(255,255,255,0.66); color: var(--accent); cursor: pointer;
+      font: 1rem/1 Georgia, serif; transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+    .gift-page-btn:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+    .gift-page-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .gift-page-dots { display: flex; gap: 0.4rem; }
+    .gift-page-dot { width: 0.42rem; height: 0.42rem; border-radius: 50%; background: rgba(192,57,43,0.22); }
+    .gift-page-dot.active { background: var(--accent); transform: scale(1.2); }
     .home-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     #list-view { max-width: 1320px; }
     @media (max-width: 960px) {
@@ -1958,10 +1970,10 @@
       <aside class="home-left-column" aria-label="主页收藏">
         <section class="gift-board" aria-labelledby="gift-board-title">
           <div class="gift-board-header">
-            <h2 class="gift-board-title" id="gift-board-title">礼物版</h2>
-            <span class="gift-board-count">GIFT 01</span>
+            <h2 class="gift-board-title" id="gift-board-title">礼物板</h2>
+            <span class="gift-board-count" id="gift-board-count">GIFT 01 / 02</span>
           </div>
-          <article class="gift-card">
+          <article class="gift-card" data-gift-page="0">
             <video class="gift-video" controls playsinline preload="metadata" aria-label="小宁送给小舟的礼物视频">
               <source src="https://raw.githubusercontent.com/Joe-lyz/My-blog/main/myblog-lyz/gifts/THE%20GIFT.mp4" type="video/mp4">
               你的浏览器暂不支持视频播放。
@@ -1969,6 +1981,21 @@
             <h3 class="gift-name">小宁送给小舟的礼物</h3>
             <p class="gift-from">From 小宁 · To 小舟</p>
           </article>
+          <article class="gift-card" data-gift-page="1" hidden>
+            <video class="gift-video" id="memory-gift-video" controls playsinline preload="metadata" aria-label="共同的回忆视频">
+              你的浏览器暂不支持视频播放。
+            </video>
+            <h3 class="gift-name">共同的回忆</h3>
+            <p class="gift-from">小宁 &amp; 小舟</p>
+          </article>
+          <div class="gift-pagination" aria-label="礼物翻页">
+            <button class="gift-page-btn" type="button" onclick="changeGiftPage(-1)" aria-label="上一份礼物">&#8249;</button>
+            <span class="gift-page-dots" aria-hidden="true">
+              <span class="gift-page-dot active"></span>
+              <span class="gift-page-dot"></span>
+            </span>
+            <button class="gift-page-btn" type="button" onclick="changeGiftPage(1)" aria-label="下一份礼物">&#8250;</button>
+          </div>
         </section>
         <div class="photo-wall-sidebar">
         <div class="pw-header">
@@ -2521,7 +2548,7 @@
 <script src="/doodle-board.js"></script>
 <script>
   // ─── State ───
-  var APP_BUILD = "小卡生日特供版";
+  var APP_BUILD = "9月版~加油小宁&小舟";
   var posts = [];
   var deletedPosts = [];
   var profile = { name: '我的名字', bio: '欢迎来到我的小角落。这里是我记录生活、分享想法的地方。\n喜欢文字、旅行和一切有趣的事物。', avatar: '' };
@@ -2532,6 +2559,32 @@
   var booksData = [];
   var postPage = 1;
   var postPageSize = 5;
+  var giftPage = 0;
+
+  function initGiftBoard() {
+    var memoryVideo = document.getElementById('memory-gift-video');
+    if (!memoryVideo || memoryVideo.querySelector('source')) return;
+    var memoryVideos = [
+      'https://raw.githubusercontent.com/Joe-lyz/My-blog/main/myblog-lyz/gifts/drone1_anaya.mp4',
+      'https://raw.githubusercontent.com/Joe-lyz/My-blog/main/myblog-lyz/gifts/drone2_anaya.mp4'
+    ];
+    var source = document.createElement('source');
+    source.src = memoryVideos[Math.floor(Math.random() * memoryVideos.length)];
+    source.type = 'video/mp4';
+    memoryVideo.prepend(source);
+  }
+
+  function changeGiftPage(direction) {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('[data-gift-page]'));
+    if (!cards.length) return;
+    cards[giftPage].querySelector('video').pause();
+    giftPage = (giftPage + direction + cards.length) % cards.length;
+    cards.forEach(function(card, index) { card.hidden = index !== giftPage; });
+    document.querySelectorAll('.gift-page-dot').forEach(function(dot, index) {
+      dot.classList.toggle('active', index === giftPage);
+    });
+    document.getElementById('gift-board-count').textContent = 'GIFT ' + String(giftPage + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+  }
 
   var externalScriptPromises = {};
 
@@ -6134,6 +6187,7 @@
 
 
   applyRandomQuote();
+  initGiftBoard();
   initPointerAmbient();
   var editorEl = document.getElementById('editor-area');
   if (editorEl) {
