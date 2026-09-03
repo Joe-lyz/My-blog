@@ -969,12 +969,30 @@
 
     /* ─── Homepage Two-Column Layout ─── */
     .home-layout { display: flex; gap: 2.5rem; }
+    .home-left-column { width: 450px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1.25rem; }
     .photo-wall-sidebar { width: 450px; flex-shrink: 0; margin-left: 8px; }
+    .gift-board {
+      position: relative; overflow: hidden; padding: 1.25rem;
+      border-radius: 28px; border: 1px solid rgba(255,255,255,0.58);
+      background: linear-gradient(145deg, rgba(255,255,255,0.86), rgba(255,239,230,0.92));
+      box-shadow: var(--shadow-soft); backdrop-filter: blur(14px);
+    }
+    .gift-board::after {
+      content: '\2661'; position: absolute; right: 18px; top: 5px;
+      color: rgba(192,57,43,0.09); font: 5rem/1 Georgia, serif; pointer-events: none;
+    }
+    .gift-board-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
+    .gift-board-title { font-family: 'Songti SC', 'STSong', serif; font-size: 1.15rem; font-weight: 700; }
+    .gift-board-count { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.12em; }
+    .gift-card { position: relative; z-index: 1; }
+    .gift-video { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; background: #211813; border-radius: 18px; box-shadow: 0 12px 28px rgba(83,52,35,0.18); }
+    .gift-name { margin-top: 0.9rem; font-family: 'Songti SC', 'STSong', serif; font-size: 1rem; font-weight: 600; }
+    .gift-from { margin-top: 0.25rem; color: var(--muted); font-size: 0.8rem; }
     .home-main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     #list-view { max-width: 1320px; }
     @media (max-width: 960px) {
       .home-layout { flex-direction: column; }
-      .photo-wall-sidebar { width: 100%; margin-left: 0; }
+      .home-left-column, .photo-wall-sidebar { width: 100%; margin-left: 0; }
       .home-top-grid { grid-template-columns: 1fr; }
       .home-posts-block { margin-top: 0; max-width: 100%; }
       .home-planner-section { transform: none; margin-left: 0; }
@@ -987,6 +1005,7 @@
       nav { justify-content: flex-start; }
       main { padding: 2rem 1rem; }
       .home-planner-section { padding: 0.8rem; transform: none; }
+      .gift-board { border-radius: 22px; }
     }
 
 
@@ -1936,7 +1955,22 @@
   <!-- 文章列表 -->
   <div id="list-view" class="view active">
     <div class="home-layout">
-      <div class="photo-wall-sidebar">
+      <aside class="home-left-column" aria-label="主页收藏">
+        <section class="gift-board" aria-labelledby="gift-board-title">
+          <div class="gift-board-header">
+            <h2 class="gift-board-title" id="gift-board-title">礼物版</h2>
+            <span class="gift-board-count">GIFT 01</span>
+          </div>
+          <article class="gift-card">
+            <video class="gift-video" controls playsinline preload="metadata" aria-label="小宁送给小舟的礼物视频">
+              <source src="https://raw.githubusercontent.com/Joe-lyz/My-blog/main/myblog-lyz/gifts/THE%20GIFT.mp4" type="video/mp4">
+              你的浏览器暂不支持视频播放。
+            </video>
+            <h3 class="gift-name">小宁送给小舟的礼物</h3>
+            <p class="gift-from">From 小宁 · To 小舟</p>
+          </article>
+        </section>
+        <div class="photo-wall-sidebar">
         <div class="pw-header">
           <div class="pw-title">照片墙</div>
           <button class="pw-add-btn" onclick="document.getElementById('photo-input').click()">+ 添加</button>
@@ -1965,7 +1999,8 @@
         <div class="pw-container" id="photo-wall-container">
           <div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:2rem 0;">点击"添加"来创建你的照片墙</div>
         </div>
-      </div>
+        </div>
+      </aside>
       <div class="home-main-content">
         <div class="home-top-grid">
           <div class="hero-section">
