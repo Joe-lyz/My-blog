@@ -184,9 +184,10 @@
                 ${dayList.map((key) => {
                   if (!key) return html`<div className="cell muted"></div>`;
                   const rec = records[key];
-                  const special = key === RELATIONSHIP_START.slice(0, 10) || key === meetupDay;
+                  const special = key === RELATIONSHIP_START.slice(0, 10);
+                  const isMeetupDay = key === meetupDay;
                   const isToday = key === dayKey(now);
-                  return html`<button type="button" className=${"cell " + (special?"special":"") + (isToday?" today":"")} onClick=${() => setEditing({ key, ...(rec || { special:false, tags:[], mood:3, note:"", media: [] }) })}><span className="d">${Number(key.slice(-2))}</span>${rec ? html`<span className="dot"></span><span className="tag">${(rec.tags||[])[0] || "已记"}</span>`:""}</button>`;
+                  return html`<button type="button" className=${"cell " + (special?"special":"") + (isMeetupDay?" meetup-date":"") + (isToday?" today":"")} onClick=${() => setEditing({ key, ...(rec || { special:false, tags:[], mood:3, note:"", media: [] }) })} aria-label=${isMeetupDay ? `${key}，下次见面日期` : key}>${isMeetupDay ? html`<span className="meetup-heart" aria-hidden="true"><span className="meetup-heart-shape">♥</span><span className="meetup-heart-day">${Number(key.slice(-2))}</span></span>` : html`<span className="d">${Number(key.slice(-2))}</span>`}${rec ? html`<span className="dot"></span><span className="tag">${(rec.tags||[])[0] || "已记"}</span>`:""}</button>`;
                 })}
                 </div>
               </div>` : html`<div className="timeline">${timeline.map(([k,v]) => html`<div className="timeline-item"><div><b>${k}</b> · 心情 ${v.mood || 3}/5</div><div className="meta">${(v.tags||[]).join(" · ") || "无标签"}</div><div>${v.note || "（无备注）"}</div></div>`)}</div>`}
