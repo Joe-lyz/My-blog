@@ -182,6 +182,19 @@ test("doodles API can save and read doodles", async () => {
   assert.equal(getRes.body[0].id, 77);
 });
 
+test("doodles API can delete a saved doodle", async () => {
+  const env = makeEnv();
+  await call(env, "/api/doodles", "POST", { id: 88, title: "待删除涂鸦", dataUrl: "data:image/png;base64,abc" });
+
+  const deleteRes = await call(env, "/api/doodles", "DELETE", { id: 88 });
+  assert.equal(deleteRes.status, 200);
+  assert.equal(deleteRes.body.ok, true);
+
+  const getRes = await call(env, "/api/doodles");
+  assert.deepEqual(getRes.body, []);
+  assert.equal(await env.BLOG_DATA.get("doodles:item:88"), null);
+});
+
 test("D1 binding persists diary data and can be read after reload", async () => {
   const db = new MockD1();
   const env = makeEnv({ BLOG_DB: db, BLOG_DATA: undefined });
